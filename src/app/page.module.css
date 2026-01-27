@@ -518,4 +518,24 @@
     width: 60px;
     height: 60px;
   }
+
+  /* Ajustes para que las tarjetas de producto (ahora en 2 columnas) se vean bien */
+  .productCard h3 {
+    font-size: 1rem !important;
+  }
+
+  .productCard p {
+    font-size: 0.8rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .productCard span {
+    font-size: 1.1rem !important;
+  }
+
+  .addBtnBrave {
+    width: 35px;
+    height: 35px;
+    font-size: 1.4rem;
+  }
 }
