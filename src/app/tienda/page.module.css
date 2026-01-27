@@ -1,0 +1,168 @@
+.shopContainer {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Opción 3: Mosaico de Hierro (Tonos Grises Industriales) */
+.shopContainer::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/logo-fruto-bravo.png');
+    background-repeat: repeat;
+    background-size: 280px;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.06;
+    filter: grayscale(1) brightness(0.8);
+    transform: rotate(-15deg) scale(1.2);
+    /* Un toque de inclinación para el estilo de mosaico */
+}
+
+.filters {
+    width: 250px;
+    flex-shrink: 0;
+}
+
+.filterSection {
+    margin-bottom: 1rem;
+}
+
+.filterTitle {
+    font-family: var(--font-outfit);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.categoryList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.categoryBtn {
+    text-align: center;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    color: black;
+    font-weight: 800;
+    font-size: 1rem;
+    border: 3px solid black;
+    transition: var(--transition);
+    background: white;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.categoryBtn:hover,
+.categoryBtn.active {
+    background: black;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.productsGrid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+.productCard {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+}
+
+.productCard:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.imageContainer {
+    height: 180px;
+    background: #f0f0f0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+}
+
+.productInfo {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.productCategory {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.productName {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.productPrice {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: auto;
+    margin-bottom: 1rem;
+}
+
+.addToCartBtn {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.addToCartBtn:hover {
+    background: var(--primary-hover);
+}
+
+@media (max-width: 900px) {
+    .shopContainer {
+        flex-direction: column;
+    }
+
+    .filters {
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    .productsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .productsGrid {
+        grid-template-columns: 1fr;
+    }
+}

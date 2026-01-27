@@ -1,0 +1,55 @@
+import Link from 'next/link';
+import { Instagram, Facebook, Mail, Phone, MapPin } from 'lucide-react'; // Facebook as placeholder for TikTok if not avail or just use Text
+import styles from './Footer.module.css';
+
+export default function Footer() {
+    return (
+        <footer className={styles.footer}>
+            <div className="container">
+                <div className={styles.grid}>
+                    {/* Brand */}
+                    <div className={styles.column}>
+                        <h3 className={styles.heading}>SONIA</h3>
+                        <p className={styles.text}>
+                            Alimentos saludables, frescos y de la mejor calidad. Venta mayorista y minorista.
+                        </p>
+                    </div>
+
+                    {/* Links */}
+                    <div className={styles.column}>
+                        <h4 className={styles.subheading}>Explorar</h4>
+                        <ul className={styles.list}>
+                            <li><Link href="/tienda">Tienda</Link></li>
+                            <li><Link href="/mayorista">Mayorista</Link></li>
+                            <li><Link href="/blog">Blog & Recetas</Link></li>
+                            <li><Link href="/sobre-nosotros">Sobre nosotros</Link></li>
+                        </ul>
+                    </div>
+
+                    {/* Contact */}
+                    <div className={styles.column}>
+                        <h4 className={styles.subheading}>Contacto</h4>
+                        <ul className={styles.contactList}>
+                            <li><Mail size={16} /> info@sonia.com.ar</li>
+                            <li><Phone size={16} /> +54 9 11 1234 5678</li>
+                            <li><MapPin size={16} /> Buenos Aires, Argentina</li>
+                        </ul>
+                    </div>
+
+                    {/* Social */}
+                    <div className={styles.column}>
+                        <h4 className={styles.subheading}>Seguinos</h4>
+                        <div className={styles.socials}>
+                            <a href="#" aria-label="Instagram"><Instagram size={24} /></a>
+                            <a href="#" aria-label="TikTok"><span style={{ fontWeight: 'bold' }}>Tk</span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles.copyright}>
+                    &copy; {new Date().getFullYear()} Sonia Alimentos Saludables. Todos los derechos reservados.
+                </div>
+            </div>
+        </footer>
+    );
+}
