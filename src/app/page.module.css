@@ -493,6 +493,8 @@
   .heroContent {
     text-align: center;
     margin: 0 auto;
+    padding-top: 90px;
+    /* Espacio para que el globo no tape el título */
   }
 
   .subtitle {
@@ -504,9 +506,11 @@
   }
 
   .speechBubble {
-    top: 10%;
-    left: 5%;
-    transform: scale(0.8);
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.85);
+    /* Centrado arriba */
+    z-index: 20;
   }
 
   .ctaContent {
