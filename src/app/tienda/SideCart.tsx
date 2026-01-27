@@ -11,33 +11,7 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
 
     return (
         <>
-            <div style={{
-                position: 'fixed',
-                top: 0,
-                right: 0,
-                width: '300px',
-                height: '100vh',
-                backgroundColor: 'rgba(255, 255, 255, 0.98)',
-                boxShadow: '-5px 0 20px rgba(0,0,0,0.1)',
-                zIndex: 10000,
-                display: 'flex',
-                flexDirection: 'column',
-                animation: 'slideInCart 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                borderLeft: '4px solid var(--primary)',
-                overflow: 'hidden',
-                backdropFilter: 'blur(5px)'
-            }}>
-                <style jsx>{`
-                    @keyframes slideInCart {
-                        from { transform: translateX(100%); }
-                        to { transform: translateX(0); }
-                    }
-                    @keyframes fadeIn {
-                        from { opacity: 0; }
-                        to { opacity: 1; }
-                    }
-                `}</style>
-
+            <div className={styles.sideCartContainer}>
                 {/* Fondo Decorativo Sutil */}
                 <div style={{
                     position: 'absolute',
