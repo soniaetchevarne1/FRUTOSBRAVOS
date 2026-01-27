@@ -338,34 +338,6 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
                 </div>
 
                 <div className={styles.shopContainer}>
-                    {/* Sidebar Filtros */}
-                    <aside className={styles.filters}>
-                        <div className={styles.filterSection}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                                <Filter size={20} />
-                                <h3 className={styles.filterTitle} style={{ margin: 0 }}>Categorías</h3>
-                            </div>
-
-                            <div className={styles.categoryList}>
-                                <button
-                                    className={`${styles.categoryBtn} ${selectedCategory === 'Todos' ? styles.active : ''}`}
-                                    onClick={() => setSelectedCategory('Todos')}
-                                >
-                                    Todos
-                                </button>
-                                {CATEGORIES.map((cat) => (
-                                    <button
-                                        key={cat}
-                                        className={`${styles.categoryBtn} ${selectedCategory === cat ? styles.active : ''}`}
-                                        onClick={() => setSelectedCategory(cat)}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </aside>
-
                     {/* Grid de Productos */}
                     <div style={{ flex: 1 }}>
                         {filteredProducts.length === 0 ? (

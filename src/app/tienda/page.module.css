@@ -186,10 +186,11 @@
 
 .categoriesList {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     padding: 0 5px;
-    /* Padding for shadow not to be cut off */
     width: max-content;
+    margin: 0 auto;
+    /* Centrar la lista */
 }
 
 .visualCategoryCard {
