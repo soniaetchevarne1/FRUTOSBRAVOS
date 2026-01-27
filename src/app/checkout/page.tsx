@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { useStore } from '@/context/StoreContext';
 import styles from './page.module.css';
 import Link from 'next/link';
+import { createOrderAction } from '@/app/actions';
 
 export default function CheckoutPage() {
     const { cart, cartTotal, isWholesale, clearCart } = useStore();
@@ -46,25 +47,50 @@ export default function CheckoutPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+
+
+    // ... inside component
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Here we would send data to backend
-        console.log('Order Data:', {
-            customer: formData,
-            cart,
+
+        const newOrder = {
+            id: crypto.randomUUID(),
+            customer: {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                dni: formData.dni,
+                address: formData.address,
+                city: formData.city,
+                zip: formData.zip
+            },
             deliveryMethod,
             paymentMethod,
-            totals: {
-                subtotal: cartTotal,
-                shipping: shippingCost,
-                discount: discountAmount,
-                final: finalTotal
-            }
-        });
+            date: new Date().toISOString(),
+            items: cart.map(item => ({
+                productId: item.id,
+                productName: item.name,
+                quantity: item.quantity,
+                price: isWholesale ? item.priceWholesale : item.priceRetail,
+                image: item.image
+            })),
+            subtotal: cartTotal,
+            shippingCost: shippingCost,
+            discount: discountAmount,
+            total: finalTotal,
+            status: 'Pendiente' as const,
+            type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
+        };
 
-        // Simulate success
-        setIsSuccess(true);
-        clearCart();
+        try {
+            await createOrderAction(newOrder);
+            setIsSuccess(true);
+            clearCart();
+        } catch (error) {
+            console.error('Error creating order:', error);
+            alert('Hubo un error al procesar tu pedido. Por favor intenta nuevamente.');
+        }
     };
 
     if (isSuccess) {

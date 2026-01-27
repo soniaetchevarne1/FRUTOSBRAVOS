@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Product, Order, BlogContent } from './types';
+import { Product, Order, OrderStatus, BlogContent } from './types';
 
 // Path to the JSON file
 const dbPath = path.join(process.cwd(), 'src', 'data', 'db.json');
@@ -58,5 +58,27 @@ export async function reorderProducts(products: Product[]) {
 }
 
 // --- ORDERS ---
-// ... (Order logic can be added similarly)
+export async function getOrders(): Promise<Order[]> {
+    const db = readDb();
+    return db.orders || [];
+}
+
+export async function saveOrder(order: Order) {
+    const db = readDb();
+    if (!db.orders) {
+        db.orders = [];
+    }
+    db.orders.unshift(order); // Add new orders to the top
+    writeDb(db);
+    return order;
+}
+
+export async function updateOrderStatus(id: string, status: OrderStatus) {
+    const db = readDb();
+    const order = db.orders.find((o: Order) => o.id === id);
+    if (order) {
+        order.status = status;
+        writeDb(db);
+    }
+}
 

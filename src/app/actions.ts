@@ -1,7 +1,7 @@
 "use server";
 
-import { saveProduct, deleteProduct, reorderProducts } from "@/lib/db";
-import { Product } from "@/lib/types";
+import { saveProduct, deleteProduct, reorderProducts, saveOrder, updateOrderStatus } from "@/lib/db";
+import { Product, Order, OrderStatus } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { writeFile } from "fs/promises";
 import path from "path";
@@ -49,4 +49,16 @@ export async function uploadImageAction(formData: FormData) {
 
     await writeFile(uploadPath, buffer);
     return relPath;
+}
+
+// --- ORDER ACTIONS ---
+
+export async function createOrderAction(order: Order) {
+    await saveOrder(order);
+    revalidatePath('/admin/ventas');
+}
+
+export async function updateOrderStatusAction(id: string, status: OrderStatus) {
+    await updateOrderStatus(id, status);
+    revalidatePath('/admin/ventas');
 }
