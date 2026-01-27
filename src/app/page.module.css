@@ -603,3 +603,65 @@
     font-size: 1.4rem;
   }
 }
+
+/* New Favorites Custom Grid */
+.favoritesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.favImgContainer {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.favInfoContainer {
+  padding: 1.25rem;
+}
+
+.favTitle {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.favPrice {
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .favoritesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    /* Muy poco espacio entre ellos */
+  }
+
+  .favImgContainer {
+    height: 120px;
+    /* Imagen mucho más chica */
+  }
+
+  .favInfoContainer {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .favTitle {
+    font-size: 0.9rem;
+    /* Titulo más chico */
+    margin-bottom: 0.25rem;
+    line-height: 1.1;
+  }
+
+  .favDesc {
+    display: none;
+    /* Ocultar descripcion para ganar espacio */
+  }
+
+  .favPrice {
+    font-size: 1rem;
+  }
+}
