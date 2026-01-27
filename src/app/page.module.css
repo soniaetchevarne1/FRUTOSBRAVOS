@@ -157,6 +157,13 @@
   }
 }
 
+.heroButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+  align-items: center;
+}
+
 .heroContent {
   max-width: 900px;
   position: relative;
@@ -506,12 +513,21 @@
   }
 
   .speechBubble {
-    top: 10px;
-    /* Un poco más arriba */
-    left: 50%;
-    transform: translateX(-50%) scale(0.6);
-    /* Más chico todavía */
-    z-index: 20;
+    display: none;
+    /* Ocultar completamente en móvil */
+  }
+
+  .heroButtons {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  /* Ajustar botones del hero para que entren uno al lado del otro */
+  .heroButtons a {
+    padding: 0.8rem 1rem !important;
+    font-size: 0.9rem !important;
+    width: auto !important;
+    white-space: nowrap !important;
   }
 
   /* FORZAR LOS 3 SUPERPODERES EN UNA FILA */

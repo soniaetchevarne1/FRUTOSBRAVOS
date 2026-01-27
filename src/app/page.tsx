@@ -78,7 +78,7 @@ export default function Home() {
                 Descubrí nuestra selección <strong style={{ color: 'var(--secondary)' }}>premium</strong> de frutos secos, especias, harinas y suplementos.
                 <span className={styles.highlight}> ¡Venta minorista y mayorista con envíos a todo el país!</span>
               </p>
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <div className={styles.heroButtons}>
                 <Link href="/tienda" className={`btn btn-primary ${styles.btnPulse}`} style={{ padding: '1rem 2rem', fontSize: '1.1rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
                   🛒 Comprar Ahora
                 </Link>
