@@ -171,23 +171,25 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
 
 
                     {cart.length > 0 && (
-                        <Link href="/checkout" style={{ width: '100%' }}>
-                            <button
-                                onClick={onClose}
-                                style={{
-                                    width: '100%',
-                                    padding: '1rem',
-                                    backgroundColor: '#D4AF37',
-                                    color: 'white',
-                                    borderRadius: '12px',
-                                    border: 'none',
-                                    fontWeight: 900,
-                                    fontSize: '0.95rem',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                ENVIAR PEDIDO 🚀
-                            </button>
+                        <Link
+                            href="/checkout"
+                            onClick={onClose}
+                            style={{
+                                width: '100%',
+                                padding: '1rem',
+                                backgroundColor: '#D4AF37',
+                                color: 'white',
+                                borderRadius: '12px',
+                                border: 'none',
+                                fontWeight: 900,
+                                fontSize: '0.95rem',
+                                cursor: 'pointer',
+                                display: 'block',
+                                textAlign: 'center',
+                                textDecoration: 'none'
+                            }}
+                        >
+                            ENVIAR PEDIDO 🚀
                         </Link>
                     )}
 
