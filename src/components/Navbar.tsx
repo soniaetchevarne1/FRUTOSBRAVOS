@@ -1,31 +1,14 @@
 "use client";
 
+import { Suspense } from 'react';
 import Link from 'next/link';
-import { Search, ShoppingCart, User, Menu } from 'lucide-react';
+import { ShoppingCart, User, Menu } from 'lucide-react';
 import styles from './Navbar.module.css';
 import { useStore } from '@/context/StoreContext';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import NavbarSearch from './NavbarSearch';
 
 export default function Navbar() {
     const { cartCount } = useStore();
-    const router = useRouter();
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
-
-    const handleSearch = (term: string) => {
-        const params = new URLSearchParams(searchParams);
-        if (term) {
-            params.set('q', term);
-        } else {
-            params.delete('q');
-        }
-
-        if (pathname !== '/tienda') {
-            router.push(`/tienda?${params.toString()}`);
-        } else {
-            router.replace(`${pathname}?${params.toString()}`);
-        }
-    };
 
     return (
         <nav className={styles.navbar}>
@@ -47,19 +30,9 @@ export default function Navbar() {
                 {/* Icons */}
                 <div className={styles.icons}>
                     <div className={styles.searchWrapper}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <input
-                                type="text"
-                                placeholder="Buscar productos..."
-                                className={styles.searchInput}
-                                defaultValue={searchParams.get('q')?.toString()}
-                                onChange={(e) => handleSearch(e.target.value)}
-                                autoFocus
-                            />
-                            <div className={styles.iconBtn}>
-                                <Search size={20} />
-                            </div>
-                        </div>
+                        <Suspense fallback={<div style={{ width: '200px' }}></div>}>
+                            <NavbarSearch />
+                        </Suspense>
                     </div>
                     <Link href="/cuenta" aria-label="Cuenta" className={styles.iconBtn}><User size={20} /></Link>
                     <Link href="/carrito" aria-label="Carrito" className={`${styles.iconBtn} ${styles.cartBtn}`}>
