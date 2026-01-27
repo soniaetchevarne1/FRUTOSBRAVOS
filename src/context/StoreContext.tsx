@@ -9,6 +9,7 @@ interface StoreContextType {
     cart: CartItem[];
     addToCart: (product: Product, quantity: number) => void;
     removeFromCart: (productId: string) => void;
+    updateQuantity: (productId: string, quantity: number) => void;
     clearCart: () => void;
     cartCount: number;
     cartTotal: number;
@@ -71,6 +72,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const openCart = () => setIsCartOpen(true);
     const closeCart = () => setIsCartOpen(false);
 
+    const updateQuantity = (productId: string, quantity: number) => {
+        setCart((prev) => prev.map((item) => {
+            if (item.id === productId) {
+                return { ...item, quantity: Math.max(1, quantity) };
+            }
+            return item;
+        }));
+    };
+
     const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
     const cartTotal = cart.reduce((acc, item) => {
@@ -84,6 +94,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 cart,
                 addToCart,
                 removeFromCart,
+                updateQuantity,
                 clearCart,
                 cartCount,
                 cartTotal,

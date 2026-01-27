@@ -1,11 +1,11 @@
 "use client";
 
 import { useStore } from "@/context/StoreContext";
-import { X, ShoppingBag, Trash2 } from "lucide-react";
+import { X, ShoppingBag, Trash2, Plus, Minus } from "lucide-react";
 import styles from "./page.module.css";
 
 export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
-    const { cart, removeFromCart, cartTotal, isWholesale } = useStore();
+    const { cart, removeFromCart, updateQuantity, cartTotal, isWholesale } = useStore();
 
     if (!isOpen) return null;
 
@@ -107,9 +107,21 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
                                         </h4>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <span style={{ fontSize: '0.7rem', color: '#888' }}>
-                                                    {item.quantity} x ${new Intl.NumberFormat('es-AR').format(isWholesale ? item.priceWholesale : item.priceRetail)}
-                                                </span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#f5f5f5', borderRadius: '5px', padding: '2px 4px' }}>
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                                                        style={{ padding: '2px', display: 'flex', color: '#666', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                                                    >
+                                                        <Minus size={14} />
+                                                    </button>
+                                                    <span style={{ fontSize: '0.9rem', fontWeight: 700, minWidth: '15px', textAlign: 'center', color: '#333' }}>{item.quantity}</span>
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        style={{ padding: '2px', display: 'flex', color: 'var(--primary)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
+                                                </div>
                                             </div>
                                             <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.95rem' }}>
                                                 ${new Intl.NumberFormat('es-AR').format((isWholesale ? item.priceWholesale : item.priceRetail) * item.quantity)}
