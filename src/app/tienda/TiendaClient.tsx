@@ -261,54 +261,7 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
             <Navbar />
 
             <div className="container">
-                <header style={{ padding: '1.5rem 0 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div>
-                        <h1 className="h2">Nuestros Productos</h1>
-                        <p className="body-lg" style={{ color: 'var(--text-secondary)' }}>
-                            {filteredProducts.length} productos encontrados
-                        </p>
-                    </div>
-
-                    {/* Botón flotante de carrito */}
-                    <button
-                        onClick={() => setIsCartOpen(true)}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            background: 'var(--primary)',
-                            color: 'white',
-                            padding: '0.75rem 1.5rem',
-                            borderRadius: '50px',
-                            fontWeight: 800,
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                            marginBottom: '1rem',
-                            position: 'relative'
-                        }}
-                    >
-                        <ShoppingCart size={20} />
-                        MI PEDIDO
-                        {cartCount > 0 && (
-                            <span style={{
-                                position: 'absolute',
-                                top: '-5px',
-                                right: '-5px',
-                                background: 'red',
-                                color: 'white',
-                                borderRadius: '50%',
-                                width: '22px',
-                                height: '22px',
-                                fontSize: '0.7rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                border: '2px solid white'
-                            }}>
-                                {cartCount}
-                            </span>
-                        )}
-                    </button>
-                </header>
+                <div style={{ paddingTop: '1.5rem' }}></div>
 
                 {selectedCategory === 'Todos' ? (
                     // VISTA INICIAL: GRID DE CATEGORÍAS
