@@ -8,7 +8,7 @@ import { useStore } from '@/context/StoreContext';
 import styles from './page.module.css';
 import { Filter, Minus, Plus, ShoppingCart, SearchX } from 'lucide-react';
 import SideCart from './SideCart';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const CATEGORIES: Category[] = ['Frutos Secos', 'Frutas Desecadas', 'Especias y Condimentos', 'Harinas', 'Semillas y Legumbres', 'Maní', 'Cereales', 'Aceites', 'Arroz', 'Suplementos', 'Otros'];
 
@@ -242,6 +242,7 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
     const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
     const [isCartOpen, setIsCartOpen] = useState(false);
     const { cartCount } = useStore();
+    const router = useRouter();
     const searchParams = useSearchParams();
     const searchQuery = searchParams.get('q')?.toLowerCase() || '';
 
@@ -263,7 +264,7 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
             <div className="container">
                 <div style={{ paddingTop: '1.5rem' }}></div>
 
-                {selectedCategory === 'Todos' ? (
+                {selectedCategory === 'Todos' && !searchQuery ? (
                     // VISTA INICIAL: GRID DE CATEGORÍAS
                     <div className={styles.shopContainer}>
                         <div style={{ flex: 1 }}>
@@ -293,7 +294,10 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
                     <>
                         <div style={{ marginBottom: '1.5rem' }}>
                             <button
-                                onClick={() => setSelectedCategory('Todos')}
+                                onClick={() => {
+                                    setSelectedCategory('Todos');
+                                    if (searchQuery) router.push('/tienda');
+                                }}
                                 className="btn"
                                 style={{ background: '#eee', color: '#555', padding: '0.5rem 1rem', fontSize: '0.9rem' }}
                             >
