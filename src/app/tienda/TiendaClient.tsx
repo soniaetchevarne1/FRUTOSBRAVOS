@@ -224,6 +224,20 @@ function ProductCard({ product, onAdd }: { product: Product, onAdd: () => void }
     );
 }
 
+const CATEGORY_IMAGES_MAP: Record<string, string> = {
+    'Frutos Secos': '/products/almendras.png',
+    'Frutas Desecadas': '/products/mix-energetico.png',
+    'Especias y Condimentos': '/products/pimenton.png',
+    'Harinas': '/placeholder/harina-almendras.jpg',
+    'Semillas y Legumbres': '/placeholder/mix-semilla.jpg',
+    'Maní': '/placeholder/mix-salado.jpg',
+    'Cereales': '/placeholder/mix-cereal.jpg',
+    'Aceites': '/logo-fruto-bravo.png',
+    'Arroz': '/logo-fruto-bravo.png',
+    'Suplementos': '/placeholder/proteina.jpg',
+    'Otros': '/logo-fruto-bravo.png'
+};
+
 export default function TiendaClient({ initialProducts }: { initialProducts: Product[] }) {
     const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -247,7 +261,7 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
             <Navbar />
 
             <div className="container">
-                <header style={{ padding: '1.5rem 0 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <header style={{ padding: '1.5rem 0 0.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
                     <div>
                         <h1 className="h2">Nuestros Productos</h1>
                         <p className="body-lg" style={{ color: 'var(--text-secondary)' }}>
@@ -295,6 +309,33 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
                         )}
                     </button>
                 </header>
+
+                {/* VISUAL CATEGORY SELECTOR */}
+                <div className={styles.categoriesScrollWrapper}>
+                    <div className={styles.categoriesList}>
+                        <div
+                            className={`${styles.visualCategoryCard} ${selectedCategory === 'Todos' ? styles.active : ''}`}
+                            onClick={() => setSelectedCategory('Todos')}
+                        >
+                            <div className={styles.catImgContainer}>
+                                <div style={{ width: '100%', height: '100%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900 }}>ALL</div>
+                            </div>
+                            <span className={styles.catName}>Todos</span>
+                        </div>
+                        {CATEGORIES.map((cat) => (
+                            <div
+                                key={cat}
+                                className={`${styles.visualCategoryCard} ${selectedCategory === cat ? styles.active : ''}`}
+                                onClick={() => setSelectedCategory(cat)}
+                            >
+                                <div className={styles.catImgContainer}>
+                                    <img src={CATEGORY_IMAGES_MAP[cat] || '/logo-fruto-bravo.png'} alt={cat} />
+                                </div>
+                                <span className={styles.catName}>{cat}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
                 <div className={styles.shopContainer}>
                     {/* Sidebar Filtros */}
