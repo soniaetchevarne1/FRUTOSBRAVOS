@@ -68,8 +68,8 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
                             <ShoppingBag size={20} />
                         </div>
                         <div>
-                            <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 900 }}>MI PEDIDO</h2>
-                            <p style={{ margin: 0, fontSize: '0.65rem', opacity: 0.8, fontWeight: 600 }}>SONIA APP</p>
+                            <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, textTransform: 'uppercase' }}>Resumen de Compra</h2>
+                            <p style={{ margin: 0, fontSize: '0.65rem', opacity: 0.9, fontWeight: 600 }}>Tus elegidos</p>
                         </div>
                     </div>
                     <button
@@ -107,6 +107,7 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
                                     borderRadius: '12px',
                                     border: '1px solid #f0f0f0',
                                     position: 'relative',
+                                    boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
                                 }}>
                                     <div style={{
                                         width: '65px',
@@ -127,21 +128,37 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
                                         )}
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.8rem', fontWeight: 800, paddingRight: '20px' }}>
+                                        <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '0.8rem', fontWeight: 800, paddingRight: '20px', color: '#333' }}>
                                             {item.name}
                                         </h4>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontSize: '0.75rem', color: '#888' }}>x{item.quantity}</span>
-                                            <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.85rem' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                <span style={{ fontSize: '0.7rem', color: '#888' }}>
+                                                    {item.quantity} x ${new Intl.NumberFormat('es-AR').format(isWholesale ? item.priceWholesale : item.priceRetail)}
+                                                </span>
+                                            </div>
+                                            <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.95rem' }}>
                                                 ${new Intl.NumberFormat('es-AR').format((isWholesale ? item.priceWholesale : item.priceRetail) * item.quantity)}
                                             </span>
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => removeFromCart(item.id)}
-                                        style={{ position: 'absolute', top: '5px', right: '5px', color: '#ff4444' }}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '8px',
+                                            right: '8px',
+                                            color: '#ff4444',
+                                            background: '#fff0f0',
+                                            borderRadius: '50%',
+                                            width: '24px',
+                                            height: '24px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
                                     >
-                                        <Trash2 size={14} />
+                                        <Trash2 size={12} />
                                     </button>
                                 </div>
                             ))}
