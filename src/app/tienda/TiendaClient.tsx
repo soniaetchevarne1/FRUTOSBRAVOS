@@ -310,75 +310,83 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
                     </button>
                 </header>
 
-                {/* VISUAL CATEGORY SELECTOR */}
-                <div className={styles.categoriesScrollWrapper}>
-                    <div className={styles.categoriesList}>
-                        <div
-                            className={`${styles.visualCategoryCard} ${selectedCategory === 'Todos' ? styles.active : ''}`}
-                            onClick={() => setSelectedCategory('Todos')}
-                        >
-                            <div className={styles.catImgContainer}>
-                                <div style={{ width: '100%', height: '100%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900 }}>ALL</div>
-                            </div>
-                            <span className={styles.catName}>Todos</span>
-                        </div>
-                        {CATEGORIES.map((cat) => (
-                            <div
-                                key={cat}
-                                className={`${styles.visualCategoryCard} ${selectedCategory === cat ? styles.active : ''}`}
-                                onClick={() => setSelectedCategory(cat)}
-                            >
-                                <div className={styles.catImgContainer}>
-                                    <img src={CATEGORY_IMAGES_MAP[cat] || '/logo-fruto-bravo.png'} alt={cat} />
-                                </div>
-                                <span className={styles.catName}>{cat}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className={styles.shopContainer}>
-                    {/* Grid de Productos */}
-                    <div style={{ flex: 1 }}>
-                        {filteredProducts.length === 0 ? (
-                            <div style={{
-                                textAlign: 'center',
-                                padding: '3rem 1rem',
-                                background: 'white',
-                                borderRadius: '24px',
-                                boxShadow: 'var(--shadow-sm)',
-                                border: '1px solid #eee'
-                            }}>
-                                <div style={{ fontSize: '5rem', marginBottom: '1.5rem' }}>🔍🥜</div>
-                                <h2 className="h3" style={{ marginBottom: '1rem' }}>No encontramos lo que buscás</h2>
-                                <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-                                    Probá con otra palabra o revisá nuestras categorías.
-                                </p>
-                                <button
-                                    onClick={() => window.location.href = '/tienda'}
-                                    className="btn btn-outline"
-                                    style={{ padding: '0.75rem 2rem' }}
-                                >
-                                    Ver todos los productos
-                                </button>
-                            </div>
-                        ) : (
-                            <div className={styles.productsGrid}>
-                                {filteredProducts.map((product) => (
-                                    <ProductCard
-                                        key={product.id}
-                                        product={product}
-                                        onAdd={() => {
-                                            setIsCartOpen(true);
-                                            // Cerrar automáticamente después de 1.5 segundos
-                                            setTimeout(() => setIsCartOpen(false), 1500);
-                                        }}
-                                    />
+                {selectedCategory === 'Todos' ? (
+                    // VISTA INICIAL: GRID DE CATEGORÍAS
+                    <div className={styles.shopContainer}>
+                        <div style={{ flex: 1 }}>
+                            <div className={styles.categoriesMainGrid}>
+                                {CATEGORIES.map((cat) => (
+                                    <div
+                                        key={cat}
+                                        className={styles.categoryMainCard}
+                                        onClick={() => setSelectedCategory(cat)}
+                                    >
+                                        <img
+                                            src={CATEGORY_IMAGES_MAP[cat] || '/logo-fruto-bravo.png'}
+                                            alt={cat}
+                                            className={styles.categoryMainImage}
+                                        />
+                                        <h3 className={styles.categoryMainTitle}>{cat}</h3>
+                                        <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                                            Ver productos
+                                        </p>
+                                    </div>
                                 ))}
                             </div>
-                        )}
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    // VISTA DE PRODUCTOS POR CATEGORÍA
+                    <>
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <button
+                                onClick={() => setSelectedCategory('Todos')}
+                                className="btn"
+                                style={{ background: '#eee', color: '#555', padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+                            >
+                                ← Volver a Categorías
+                            </button>
+                        </div>
+
+                        <div className={styles.shopContainer}>
+                            <div style={{ flex: 1 }}>
+                                {filteredProducts.length === 0 ? (
+                                    <div style={{
+                                        textAlign: 'center',
+                                        padding: '3rem 1rem',
+                                        background: 'white',
+                                        borderRadius: '24px',
+                                        boxShadow: 'var(--shadow-sm)',
+                                        border: '1px solid #eee'
+                                    }}>
+                                        <div style={{ fontSize: '5rem', marginBottom: '1.5rem' }}>🔍🥜</div>
+                                        <h2 className="h3" style={{ marginBottom: '1rem' }}>No encontramos productos en {selectedCategory}</h2>
+                                        <button
+                                            onClick={() => setSelectedCategory('Todos')}
+                                            className="btn btn-primary"
+                                            style={{ padding: '0.75rem 2rem' }}
+                                        >
+                                            Ver otras categorías
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className={styles.productsGrid}>
+                                        {filteredProducts.map((product) => (
+                                            <ProductCard
+                                                key={product.id}
+                                                product={product}
+                                                onAdd={() => {
+                                                    setIsCartOpen(true);
+                                                    setTimeout(() => setIsCartOpen(false), 1500);
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Carrito Lateral */}
