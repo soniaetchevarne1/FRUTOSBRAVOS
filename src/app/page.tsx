@@ -19,6 +19,9 @@ export default function Home() {
   const [currentImage, setCurrentImage] = useState(0);
 
   useEffect(() => {
+    // Force scroll to top on mount to ensure user sees the Hero
+    window.scrollTo(0, 0);
+
     const timer = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % HERO_IMAGES.length);
     }, 5000);
