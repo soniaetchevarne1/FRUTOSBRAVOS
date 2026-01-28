@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import { Category, Product } from '@/lib/types';
 import { useStore } from '@/context/StoreContext';
 import styles from './page.module.css';
-import { Filter, Minus, Plus, ShoppingCart, SearchX, LayoutGrid, List } from 'lucide-react';
+import { Filter, Minus, Plus, ShoppingCart, SearchX } from 'lucide-react';
 import SideCart from './SideCart';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -240,20 +240,7 @@ const CATEGORY_IMAGES_MAP: Record<string, string> = {
 
 export default function TiendaClient({ initialProducts }: { initialProducts: Product[] }) {
     const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-    // Persistence fix
-    useEffect(() => {
-        const saved = localStorage.getItem('productViewMode');
-        if (saved === 'grid' || saved === 'list') {
-            setViewMode(saved);
-        }
-    }, []);
-
-    const handleViewModeChange = (mode: 'grid' | 'list') => {
-        setViewMode(mode);
-        localStorage.setItem('productViewMode', mode);
-    };
+    // View mode removed at user request
 
     // const [isCartOpen, setIsCartOpen] = useState(false); // Global now
     const { cartCount } = useStore();
@@ -329,25 +316,6 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
                                 ← Volver a Categorías
                             </button>
 
-                            {/* View Toggle - Visible en todos los dispositivos */}
-                            <div className={styles.viewToggle} style={{ display: 'flex' }}>
-                                <button
-                                    className={`${styles.toggleBtn} ${viewMode === 'grid' ? styles.active : ''}`}
-                                    onClick={() => handleViewModeChange('grid')}
-                                    title="Vista Cuadrícula"
-                                >
-                                    <LayoutGrid size={20} />
-                                    <span className={styles.toggleText}>Cuadrícula</span>
-                                </button>
-                                <button
-                                    className={`${styles.toggleBtn} ${viewMode === 'list' ? styles.active : ''}`}
-                                    onClick={() => handleViewModeChange('list')}
-                                    title="Vista Líneas"
-                                >
-                                    <List size={20} />
-                                    <span className={styles.toggleText}>Líneas</span>
-                                </button>
-                            </div>
                         </div>
 
                         <div className={styles.shopContainer}>
@@ -372,7 +340,7 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className={`${styles.productsGrid} ${viewMode === 'grid' ? styles.gridMode : styles.listMode}`}>
+                                    <div className={styles.productsGrid}>
                                         {filteredProducts.map((product) => (
                                             <ProductCard
                                                 key={product.id}
