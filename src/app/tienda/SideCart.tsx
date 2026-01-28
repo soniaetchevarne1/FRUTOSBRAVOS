@@ -180,8 +180,8 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
 
 
                     {cart.length > 0 && (
-                        <button
-                            onClick={handleCheckout}
+                        <Link
+                            href="/checkout"
                             style={{
                                 width: '100%',
                                 padding: '1rem',
@@ -194,11 +194,12 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
                                 cursor: 'pointer',
                                 display: 'block',
                                 textAlign: 'center',
-                                textDecoration: 'none'
+                                textDecoration: 'none',
+                                marginTop: '1rem'
                             }}
                         >
                             ENVIAR PEDIDO 🚀
-                        </button>
+                        </Link>
                     )}
 
                     {/* Mas dibujos alegres */}
