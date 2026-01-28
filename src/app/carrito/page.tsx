@@ -1,189 +1,282 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useStore } from '@/context/StoreContext';
+import styles from './pedido.module.css';
 import Link from 'next/link';
-import { Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { createOrderAction } from '@/app/actions';
+import { Trash2, Plus, Minus, ShoppingBag, Truck, CreditCard, User } from 'lucide-react';
 
-export default function CartPage() {
-    const { cart, removeFromCart, clearCart, cartTotal, isWholesale } = useStore();
+export default function MobileCartPage() {
+    const { cart, cartTotal, isWholesale, clearCart, updateQuantity, removeFromCart } = useStore();
+
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        dni: '',
+        address: '',
+        city: '',
+        province: '',
+        zip: '',
+    });
+
+    const [deliveryMethod, setDeliveryMethod] = useState<'envio' | 'retiro'>('envio');
+    const [paymentMethod, setPaymentMethod] = useState<'transferencia' | 'efectivo'>('transferencia');
+    const [isSuccess, setIsSuccess] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Shipping Cost Logic
+    const shippingCost = deliveryMethod === 'envio' ? (cartTotal > 50000 ? 0 : 3500) : 0;
+
+    // Payment Logic (10% OFF for cash)
+    const discountAmount = paymentMethod === 'efectivo' ? cartTotal * 0.10 : 0;
+    const finalTotal = cartTotal + shippingCost - discountAmount;
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        const newOrder = {
+            id: crypto.randomUUID(),
+            customer: {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                dni: formData.dni,
+                address: formData.address,
+                city: formData.city,
+                zip: formData.zip
+            },
+            deliveryMethod,
+            paymentMethod,
+            date: new Date().toISOString(),
+            items: cart.map(item => ({
+                productId: item.id,
+                productName: item.name,
+                quantity: item.quantity,
+                price: isWholesale ? item.priceWholesale : item.priceRetail,
+                image: item.image
+            })),
+            subtotal: cartTotal,
+            shippingCost: shippingCost,
+            discount: discountAmount,
+            total: finalTotal,
+            status: 'Pendiente' as const,
+            type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
+        };
+
+        try {
+            await createOrderAction(newOrder);
+            setIsSuccess(true);
+            clearCart();
+            window.scrollTo(0, 0);
+        } catch (error) {
+            console.error('Error creating order:', error);
+            alert('Hubo un error al procesar tu pedido. Por favor intenta nuevamente.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (isSuccess) {
+        return (
+            <>
+                <Navbar />
+                <div className={styles.container} style={{ textAlign: 'center', padding: '4rem 1rem' }}>
+                    <div style={{ width: '80px', height: '80px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem', color: 'white' }}>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <h1 style={{ fontWeight: 900, marginBottom: '1rem' }}>¡PEDIDO ENVIADO!</h1>
+                    <p style={{ color: '#666', marginBottom: '2rem' }}>
+                        Tu pedido ha sido recibido con éxito. Nos pondremos en contacto contigo pronto por WhatsApp o Email.
+                    </p>
+                    <Link href="/tienda" className={styles.submitBtn}>VOLVER A LA TIENDA</Link>
+                </div>
+                <Footer />
+            </>
+        );
+    }
+
+    if (cart.length === 0) {
+        return (
+            <>
+                <Navbar />
+                <div className={styles.container} style={{ textAlign: 'center', padding: '5rem 1rem' }}>
+                    <ShoppingBag size={64} style={{ color: '#ccc', marginBottom: '1.5rem' }} />
+                    <h2 style={{ fontWeight: 800 }}>TU CARRITO ESTÁ VACÍO</h2>
+                    <p style={{ color: '#666', marginBottom: '2rem' }}>¡Agrega algunos productos deliciosos!</p>
+                    <Link href="/tienda" className={styles.submitBtn}>EXPLORAR PRODUCTOS</Link>
+                </div>
+                <Footer />
+            </>
+        );
+    }
 
     return (
         <>
             <Navbar />
-            <div className="container" style={{ padding: '2rem 0' }}>
-                <header style={{ marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <Link href="/tienda" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center' }}>
-                        <ArrowLeft size={24} />
-                    </Link>
-                    <h1 className="h2" style={{ margin: 0 }}>Carrito de Compras</h1>
-                </header>
+            <div className={styles.container}>
+                <h1 className={styles.mainTitle}>MI PEDIDO 🛒</h1>
 
-                {cart.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '5rem 0' }}>
-                        <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>🛒</div>
-                        <h2 className="h3">Tu carrito está vacío</h2>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>¡Explorá nuestros deliciosos frutos secos y empezá a sumar!</p>
-                        <Link href="/tienda" className="btn btn-primary" style={{ padding: '1rem 3rem' }}>
-                            IR A LA TIENDA
-                        </Link>
-                    </div>
-                ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) 350px', gap: '3rem' }}>
-                        {/* Items List */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {cart.map((item) => (
-                                <div key={item.id} style={{
-                                    display: 'flex',
-                                    gap: '1.25rem',
-                                    padding: '1rem 1.25rem',
-                                    background: 'white',
-                                    borderRadius: '16px',
-                                    border: '1px solid #eee',
-                                    boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-                                    alignItems: 'center',
-                                    position: 'relative'
-                                }}>
-                                    <div style={{
-                                        width: '80px',
-                                        height: '80px',
-                                        borderRadius: '12px',
-                                        overflow: 'hidden',
-                                        flexShrink: 0,
-                                        border: '1px solid #f0f0f0'
-                                    }}>
-                                        {item.image ? (
-                                            <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        ) : (
-                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', fontSize: '1.5rem' }}>🌰</div>
-                                        )}
-                                    </div>
-
-                                    <div style={{ flex: 1 }}>
-                                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#2c3e50', marginBottom: '0.5rem' }}>{item.name}</h3>
-                                        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-                                            <div>
-                                                <p style={{ margin: 0, fontSize: '0.85rem', color: '#888', fontWeight: 600 }}>CANTIDAD</p>
-                                                <p style={{ margin: 0, fontWeight: 700 }}>{item.quantity} un.</p>
-                                            </div>
-                                            <div>
-                                                <p style={{ margin: 0, fontSize: '0.85rem', color: '#888', fontWeight: 600 }}>PRECIO UNITARIO</p>
-                                                <p style={{ margin: 0, fontWeight: 700, color: 'var(--primary)' }}>${new Intl.NumberFormat('es-AR').format(isWholesale ? item.priceWholesale : item.priceRetail)}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div style={{ textAlign: 'right', minWidth: '120px' }}>
-                                        <p style={{ margin: 0, fontSize: '0.85rem', color: '#888', fontWeight: 600 }}>SUBTOTAL</p>
-                                        <p style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--primary)', margin: 0 }}>
-                                            ${new Intl.NumberFormat('es-AR').format((isWholesale ? item.priceWholesale : item.priceRetail) * item.quantity)}
-                                        </p>
-                                    </div>
-
-                                    <button
-                                        onClick={() => removeFromCart(item.id)}
-                                        style={{
-                                            background: '#fff5f5',
-                                            color: '#ff4444',
-                                            padding: '10px',
-                                            borderRadius: '12px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            transition: 'all 0.2s ease',
-                                            marginLeft: '1rem'
-                                        }}
-                                        onMouseOver={(e) => e.currentTarget.style.background = '#ffebeb'}
-                                        onMouseOut={(e) => e.currentTarget.style.background = '#fff5f5'}
-                                    >
-                                        <Trash2 size={20} />
-                                    </button>
+                {/* 1. RESUMEN DE PRODUCTOS */}
+                <div className={styles.card}>
+                    <h2 className={styles.cardTitle}><ShoppingBag size={20} /> Resumen de Compra</h2>
+                    <div className={styles.itemList}>
+                        {cart.map((item) => (
+                            <div key={item.id} className={styles.item}>
+                                <div className={styles.itemImage}>
+                                    {item.image ? <img src={item.image} alt={item.name} /> : <span>🌰</span>}
                                 </div>
-                            ))}
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', padding: '0 1rem' }}>
-                                <Link href="/tienda" style={{
-                                    color: 'var(--primary)',
-                                    fontWeight: 800,
-                                    textDecoration: 'none',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.75rem',
-                                    border: '3px solid var(--primary)',
-                                    padding: '0.75rem 1.5rem',
-                                    borderRadius: '12px',
-                                    transition: 'all 0.1s ease',
-                                    backgroundColor: 'white'
-                                }}
-                                    onMouseDown={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'var(--primary)';
-                                        e.currentTarget.style.color = 'white';
-                                    }}
-                                    onMouseUp={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'white';
-                                        e.currentTarget.style.color = 'var(--primary)';
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#f0fdf4';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'white';
-                                        e.currentTarget.style.color = 'var(--primary)';
-                                    }}
-                                >
-                                    <ArrowLeft size={20} /> SEGUIR COMPRANDO
-                                </Link>
-                                <button
-                                    onClick={clearCart}
-                                    style={{ background: 'none', border: 'none', color: '#888', fontWeight: 600, textDecoration: 'underline', cursor: 'pointer' }}
-                                >
-                                    Vaciar mi carrito
+                                <div className={styles.itemInfo}>
+                                    <h3>{item.name}</h3>
+                                    <div className={styles.itemControls}>
+                                        <div className={styles.quantityPicker}>
+                                            <button onClick={() => updateQuantity(item.id, item.quantity - 1)}><Minus size={14} /></button>
+                                            <span>{item.quantity}</span>
+                                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus size={14} /></button>
+                                        </div>
+                                        <span className={styles.itemPrice}>
+                                            ${new Intl.NumberFormat('es-AR').format((isWholesale ? item.priceWholesale : item.priceRetail) * item.quantity)}
+                                        </span>
+                                    </div>
+                                </div>
+                                <button className={styles.removeBtn} onClick={() => removeFromCart(item.id)}>
+                                    <Trash2 size={16} />
                                 </button>
                             </div>
+                        ))}
+                    </div>
+                    <div className={styles.subtotalRow}>
+                        <span>Subtotal:</span>
+                        <span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span>
+                    </div>
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    {/* 2. DATOS DE ENVIO */}
+                    <div className={styles.card}>
+                        <h2 className={styles.cardTitle}><User size={20} /> Mis Datos</h2>
+                        <div className={styles.grid}>
+                            <div className={styles.inputGroup}>
+                                <label>Nombre *</label>
+                                <input required name="firstName" value={formData.firstName} onChange={handleInputChange} placeholder="Tu nombre" />
+                            </div>
+                            <div className={styles.inputGroup}>
+                                <label>Apellido *</label>
+                                <input required name="lastName" value={formData.lastName} onChange={handleInputChange} placeholder="Tu apellido" />
+                            </div>
                         </div>
-
-                        {/* Summary Section */}
-                        <div style={{
-                            background: 'white',
-                            padding: '1.5rem',
-                            borderRadius: '20px',
-                            height: 'fit-content',
-                            border: '1px solid #eee',
-                            boxShadow: '0 8px 25px rgba(0,0,0,0.05)',
-                            position: 'sticky',
-                            top: '100px'
-                        }}>
-                            <h3 className="h3" style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem' }}>
-                                <ShoppingBag size={22} /> Total Pedido
-                            </h3>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: '#666', fontWeight: 600, fontSize: '0.9rem' }}>
-                                <span>Subtotal</span>
-                                <span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span>
-                            </div>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', padding: '1.25rem 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee' }}>
-                                <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>TOTAL</span>
-                                <span style={{ fontWeight: 900, fontSize: '1.6rem', color: 'var(--primary)' }}>
-                                    ${new Intl.NumberFormat('es-AR').format(cartTotal)}
-                                </span>
-                            </div>
-
-                            <Link href="/checkout" className="btn btn-primary" style={{ width: '100%', textAlign: 'center', textDecoration: 'none', padding: '1rem', fontSize: '1rem', borderRadius: '12px' }}>
-                                INICIAR COMPRA 🚀
-                            </Link>
-
-                            <p style={{ textAlign: 'center', marginTop: '1.5rem', color: '#888', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                🔒 Pago 100% Seguro
-                            </p>
-
-                            <div style={{ textAlign: 'center', marginTop: '2rem', fontSize: '2rem' }}>
-                                🥜😊✨
-                            </div>
+                        <div className={styles.inputGroup}>
+                            <label>Teléfono (WhatsApp) *</label>
+                            <input required type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Ej: 11 1234 5678" />
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>Email *</label>
+                            <input required type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="ejemplo@correo.com" />
                         </div>
                     </div>
-                )}
+
+                    <div className={styles.card}>
+                        <h2 className={styles.cardTitle}><Truck size={20} /> Entrega</h2>
+                        <div className={styles.radioGroup}>
+                            <label className={`${styles.radioCard} ${deliveryMethod === 'envio' ? styles.active : ''}`}>
+                                <input type="radio" checked={deliveryMethod === 'envio'} onChange={() => setDeliveryMethod('envio')} />
+                                <div className={styles.radioContent}>
+                                    <strong>Envío a Domicilio</strong>
+                                    <span>{cartTotal > 50000 ? 'GRATIS' : '$3.500'}</span>
+                                </div>
+                            </label>
+                            <label className={`${styles.radioCard} ${deliveryMethod === 'retiro' ? styles.active : ''}`}>
+                                <input type="radio" checked={deliveryMethod === 'retiro'} onChange={() => setDeliveryMethod('retiro')} />
+                                <div className={styles.radioContent}>
+                                    <strong>Retiro en Local</strong>
+                                    <span>GRATIS</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        {deliveryMethod === 'envio' && (
+                            <div className={styles.addressFields}>
+                                <div className={styles.inputGroup}>
+                                    <label>Calle y Número *</label>
+                                    <input required name="address" value={formData.address} onChange={handleInputChange} placeholder="Ej. Av. Rivadavia 1234" />
+                                </div>
+                                <div className={styles.grid}>
+                                    <div className={styles.inputGroup}>
+                                        <label>Localidad *</label>
+                                        <input required name="city" value={formData.city} onChange={handleInputChange} placeholder="Tu ciudad" />
+                                    </div>
+                                    <div className={styles.inputGroup}>
+                                        <label>Cód. Postal *</label>
+                                        <input required name="zip" value={formData.zip} onChange={handleInputChange} placeholder="CP" />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 3. PAGO */}
+                    <div className={styles.card}>
+                        <h2 className={styles.cardTitle}><CreditCard size={20} /> Pago</h2>
+                        <div className={styles.radioGroup}>
+                            <label className={`${styles.radioCard} ${paymentMethod === 'transferencia' ? styles.active : ''}`}>
+                                <input type="radio" checked={paymentMethod === 'transferencia'} onChange={() => setPaymentMethod('transferencia')} />
+                                <div className={styles.radioContent}>
+                                    <strong>Transferencia</strong>
+                                    <span>Precio de lista</span>
+                                </div>
+                            </label>
+                            <label className={`${styles.radioCard} ${paymentMethod === 'efectivo' ? styles.active : ''}`}>
+                                <input type="radio" checked={paymentMethod === 'efectivo'} onChange={() => setPaymentMethod('efectivo')} />
+                                <div className={styles.radioContent}>
+                                    <strong>Efectivo</strong>
+                                    <span style={{ color: '#22c55e' }}>10% DE DESCUENTO</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* TOTAL Y BOTON FINAL */}
+                    <div className={styles.totalCard}>
+                        <div className={styles.totalRow}>
+                            <span>Subtotal</span>
+                            <span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span>
+                        </div>
+                        <div className={styles.totalRow}>
+                            <span>Envío</span>
+                            <span>{shippingCost === 0 ? 'GRATIS' : `$${new Intl.NumberFormat('es-AR').format(shippingCost)}`}</span>
+                        </div>
+                        {discountAmount > 0 && (
+                            <div className={styles.totalRow} style={{ color: '#22c55e' }}>
+                                <span>Descuento Efectivo</span>
+                                <span>-${new Intl.NumberFormat('es-AR').format(discountAmount)}</span>
+                            </div>
+                        )}
+                        <div className={styles.finalTotal}>
+                            <span>TOTAL A PAGAR</span>
+                            <span>${new Intl.NumberFormat('es-AR').format(finalTotal)}</span>
+                        </div>
+
+                        <button type="submit" disabled={isLoading} className={styles.submitBtn}>
+                            {isLoading ? 'PROCESANDO...' : 'CONFIRMAR PEDIDO 🚀'}
+                        </button>
+                        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#888', marginTop: '1rem' }}>
+                            Al confirmar, recibirás un mensaje con los datos para concretar tu compra.
+                        </p>
+                    </div>
+                </form>
             </div>
             <Footer />
         </>

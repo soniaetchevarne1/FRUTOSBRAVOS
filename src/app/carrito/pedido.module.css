@@ -1,0 +1,285 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 4rem;
+    font-family: var(--font-outfit);
+}
+
+.mainTitle {
+    font-size: 1.75rem;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-main);
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+}
+
+.cardTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+    text-transform: uppercase;
+}
+
+.itemList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f5f5f5;
+    position: relative;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.itemImage {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f9f9f9;
+    flex-shrink: 0;
+}
+
+.itemImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.itemInfo {
+    flex: 1;
+}
+
+.itemInfo h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    padding-right: 25px;
+}
+
+.itemControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.quantityPicker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #f5f5f5;
+    padding: 2px 8px;
+    border-radius: 8px;
+}
+
+.quantityPicker button {
+    border: none;
+    background: transparent;
+    padding: 4px;
+    display: flex;
+    cursor: pointer;
+    color: #555;
+}
+
+.quantityPicker span {
+    font-weight: 700;
+    font-size: 0.9rem;
+    min-width: 15px;
+    text-align: center;
+}
+
+.itemPrice {
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.removeBtn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none;
+    background: #fff0f0;
+    color: #ff4444;
+    padding: 6px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.subtotalRow {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    padding-top: 1rem;
+    border-top: 2px dashed #eee;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.inputGroup {
+    margin-bottom: 1rem;
+}
+
+.inputGroup label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: #666;
+}
+
+.inputGroup input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.inputGroup input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(44, 94, 80, 0.1);
+}
+
+.radioGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radioCard {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.radioCard input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 1rem;
+    accent-color: var(--primary);
+}
+
+.radioContent {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.radioContent strong {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.radioContent span {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #666;
+}
+
+.radioCard.active {
+    border-color: var(--primary);
+    background: rgba(44, 94, 80, 0.05);
+}
+
+.addressFields {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.totalCard {
+    background: #222;
+    color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.totalRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.finalTotal {
+    display: flex;
+    justify-content: space-between;
+    margin: 1.5rem 0;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.finalTotal span:first-child {
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.finalTotal span:last-child {
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 1.1rem;
+    background: #D4AF37;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-weight: 900;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    transition: all 0.2s;
+}
+
+.submitBtn:active {
+    transform: scale(0.98);
+}
+
+@media (max-width: 480px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

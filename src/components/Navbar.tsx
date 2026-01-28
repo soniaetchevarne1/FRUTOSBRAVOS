@@ -35,10 +35,10 @@ export default function Navbar() {
                         </Suspense>
                     </div>
                     <Link href="/cuenta" aria-label="Cuenta" className={styles.iconBtn}><User size={20} /></Link>
-                    <button onClick={openCart} aria-label="Carrito" className={`${styles.iconBtn} ${styles.cartBtn}`}>
+                    <Link href="/carrito" aria-label="Carrito" className={`${styles.iconBtn} ${styles.cartBtn}`}>
                         <ShoppingCart size={20} />
                         {cartCount > 0 && <span className={styles.badge}>{cartCount}</span>}
-                    </button>
+                    </Link>
                     <button className={styles.mobileMenu} aria-label="Menu"><Menu size={24} /></button>
                 </div>
             </div>

@@ -72,7 +72,7 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
             {cart.length > 0 && (
                 <div style={{ padding: '1rem', borderBottom: '1px solid #f0f0f0', position: 'relative', zIndex: 15 }}>
                     <a
-                        href="/checkout"
+                        href="/carrito"
                         style={{
                             display: 'block',
                             width: '100%',
@@ -89,7 +89,7 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
                             zIndex: 30
                         }}
                     >
-                        PAGAR AHORA 🚀
+                        VER CARRITO 🚀
                     </a>
                 </div>
             )}
@@ -205,7 +205,7 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
 
                 {cart.length > 0 && (
                     <a
-                        href="/checkout"
+                        href="/carrito"
                         style={{
                             display: 'block',
                             width: '100%',
@@ -223,7 +223,7 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
                             zIndex: 30
                         }}
                     >
-                        FINALIZAR COMPRA 🚀
+                        INICIAR PEDIDO 🚀
                     </a>
                 )}
             </div>
