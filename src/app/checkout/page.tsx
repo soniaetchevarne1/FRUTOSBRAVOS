@@ -4,123 +4,99 @@ import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useStore } from '@/context/StoreContext';
-import styles from './page.module.css';
 import Link from 'next/link';
 import { createOrderAction } from '@/app/actions';
+import { ChevronLeft } from 'lucide-react';
 
 export default function CheckoutPage() {
     const { cart, cartTotal, isWholesale, clearCart } = useStore();
 
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        dni: '',
-        address: '',
-        city: '',
-        province: '',
-        zip: '',
-    });
+    const [nombre, setNombre] = useState('');
+    const [telefono, setTelefono] = useState('');
+    const [email, setEmail] = useState('');
+    const [direccion, setDireccion] = useState('');
+    const [ciudad, setCiudad] = useState('');
+    const [cp, setCp] = useState('');
+    const [envio, setEnvio] = useState('envio');
+    const [pago, setPago] = useState('transferencia');
+    const [enviando, setEnviando] = useState(false);
 
-    const [deliveryMethod, setDeliveryMethod] = useState<'envio' | 'retiro'>('envio');
-    const [paymentMethod, setPaymentMethod] = useState<'transferencia' | 'efectivo' | 'tarjeta'>('transferencia');
-    const [isSuccess, setIsSuccess] = useState(false);
+    const costoEnvio = envio === 'envio' ? (cartTotal > 50000 ? 0 : 3500) : 0;
+    const descuento = pago === 'efectivo' ? cartTotal * 0.10 : 0;
+    const total = cartTotal + costoEnvio - descuento;
 
-    // Mock Shipping Cost Logic
-    const shippingCost = deliveryMethod === 'envio' ? (cartTotal > 50000 ? 0 : 3500) : 0;
+    const enviarPedido = async () => {
+        if (!nombre || !telefono || !email) {
+            alert('Por favor completa Nombre, Teléfono y Email');
+            return;
+        }
+        if (envio === 'envio' && !direccion) {
+            alert('Por favor completa la dirección de envío');
+            return;
+        }
 
-    // Mock Payment Logic
-    const getPaymentModifier = () => {
-        if (paymentMethod === 'efectivo') return -0.10; // 10% discount
-        // if (paymentMethod === 'tarjeta') return 0.05; // 5% surcharge
-        return 0; // Transferencia same price
-    };
-
-    const discountAmount = cartTotal * (getPaymentModifier() < 0 ? Math.abs(getPaymentModifier()) : 0);
-    const surchargeAmount = cartTotal * (getPaymentModifier() > 0 ? getPaymentModifier() : 0);
-
-    const finalTotal = cartTotal + shippingCost - discountAmount + surchargeAmount;
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-
-
-    // ... inside component
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const newOrder = {
-            id: crypto.randomUUID(),
-            customer: {
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                email: formData.email,
-                phone: formData.phone,
-                dni: formData.dni,
-                address: formData.address,
-                city: formData.city,
-                zip: formData.zip
-            },
-            deliveryMethod,
-            paymentMethod,
-            date: new Date().toISOString(),
-            items: cart.map(item => ({
-                productId: item.id,
-                productName: item.name,
-                quantity: item.quantity,
-                price: isWholesale ? item.priceWholesale : item.priceRetail,
-                image: item.image
-            })),
-            subtotal: cartTotal,
-            shippingCost: shippingCost,
-            discount: discountAmount,
-            total: finalTotal,
-            status: 'Pendiente' as const,
-            type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
-        };
+        setEnviando(true);
 
         try {
-            await createOrderAction(newOrder);
-            setIsSuccess(true);
+            const pedido = {
+                id: 'PED-' + Date.now(),
+                customer: {
+                    firstName: nombre,
+                    lastName: '',
+                    email: email,
+                    phone: telefono,
+                    dni: '',
+                    address: direccion,
+                    city: ciudad,
+                    zip: cp
+                },
+                deliveryMethod: envio,
+                paymentMethod: pago,
+                date: new Date().toISOString(),
+                items: cart.map(item => ({
+                    productId: item.id,
+                    productName: item.name,
+                    quantity: item.quantity,
+                    price: isWholesale ? item.priceWholesale : item.priceRetail,
+                })),
+                subtotal: cartTotal,
+                shippingCost: costoEnvio,
+                discount: descuento,
+                total: total,
+                status: 'Pendiente' as const,
+                type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
+            };
+
+            await createOrderAction(pedido);
+            alert('¡PEDIDO ENVIADO CON ÉXITO! Nos comunicaremos pronto por WhatsApp.');
             clearCart();
+            window.location.href = '/tienda';
         } catch (error) {
-            console.error('Error creating order:', error);
-            alert('Hubo un error al procesar tu pedido. Por favor intenta nuevamente.');
+            alert('Error al enviar el pedido. Por favor intenta nuevamente.');
+        } finally {
+            setEnviando(false);
         }
     };
-
-    if (isSuccess) {
-        return (
-            <>
-                <Navbar />
-                <div className="container section" style={{ textAlign: 'center', minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ width: '80px', height: '80px', background: 'var(--success)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', color: 'white' }}>
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    </div>
-                    <h1 className="h2" style={{ marginBottom: '1rem' }}>¡Gracias por tu compra!</h1>
-                    <p className="body-lg" style={{ color: 'var(--text-secondary)', maxWidth: '500px', marginBottom: '2rem' }}>
-                        Tu pedido ha sido recibido correctamente. Te enviamos un email con los detalles y los pasos a seguir para el pago.
-                    </p>
-                    <Link href="/" className="btn btn-primary">Volver al inicio</Link>
-                </div>
-                <Footer />
-            </>
-        );
-    }
 
     if (cart.length === 0) {
         return (
             <>
                 <Navbar />
-                <div className="container section">
-                    <p>No hay items en el carrito para finalizar la compra.</p>
-                    <Link href="/tienda" className="btn btn-primary" style={{ marginTop: '1rem' }}>Ir a la tienda</Link>
+                <div style={{ maxWidth: '600px', margin: '0 auto', padding: '4rem 1rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '4rem' }}>📦</div>
+                    <h2 style={{ fontWeight: 800, marginBottom: '1rem' }}>NO HAY PRODUCTOS EN EL CARRITO</h2>
+                    <p style={{ color: '#666', marginBottom: '2rem' }}>Agrega productos antes de finalizar tu pedido.</p>
+                    <Link href="/tienda" style={{
+                        display: 'inline-block',
+                        padding: '1rem 2rem',
+                        background: '#D4AF37',
+                        color: 'white',
+                        borderRadius: '10px',
+                        textDecoration: 'none',
+                        fontWeight: 800
+                    }}>
+                        IR A LA TIENDA
+                    </Link>
                 </div>
                 <Footer />
             </>
@@ -130,158 +106,332 @@ export default function CheckoutPage() {
     return (
         <>
             <Navbar />
-            <div className="container">
-                <div style={{ padding: '3rem 0' }}>
-                    <h1 className="h2" style={{ marginBottom: '2rem' }}>Finalizar Compra</h1>
+            <div style={{
+                maxWidth: '600px',
+                margin: '0 auto',
+                padding: '2rem 1rem 150px',
+                background: '#f8f9fa',
+                minHeight: '100vh'
+            }}>
 
-                    <form onSubmit={handleSubmit} className={styles.checkoutContainer}>
+                <Link
+                    href="/carrito"
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        color: '#2c5e50',
+                        textDecoration: 'none',
+                        fontWeight: 700,
+                        marginBottom: '1.5rem'
+                    }}
+                >
+                    <ChevronLeft size={20} /> Volver al Carrito
+                </Link>
 
-                        {/* LEFT COLUMN - FORMS */}
-                        <div className={styles.formSection}>
+                <h1 style={{
+                    fontSize: '1.75rem',
+                    fontWeight: 900,
+                    textAlign: 'center',
+                    marginBottom: '2rem',
+                    color: '#333'
+                }}>
+                    DATOS DE ENVÍO
+                </h1>
 
-                            {/* 1. Datos Personales */}
-                            <section>
-                                <h2 className={styles.sectionTitle}>1. Datos Personales</h2>
-                                <div className={styles.grid2}>
-                                    <div className={styles.inputGroup}>
-                                        <label className={styles.label}>Nombre</label>
-                                        <input required name="firstName" className={styles.input} value={formData.firstName} onChange={handleInputChange} />
-                                    </div>
-                                    <div className={styles.inputGroup}>
-                                        <label className={styles.label}>Apellido</label>
-                                        <input required name="lastName" className={styles.input} value={formData.lastName} onChange={handleInputChange} />
-                                    </div>
-                                </div>
-                                <div className={styles.grid2}>
-                                    <div className={styles.inputGroup}>
-                                        <label className={styles.label}>Email</label>
-                                        <input required type="email" name="email" className={styles.input} value={formData.email} onChange={handleInputChange} />
-                                    </div>
-                                    <div className={styles.inputGroup}>
-                                        <label className={styles.label}>Teléfono</label>
-                                        <input required type="tel" name="phone" className={styles.input} value={formData.phone} onChange={handleInputChange} />
-                                    </div>
-                                </div>
-                            </section>
+                {/* DATOS PERSONALES */}
+                <div style={{ background: 'white', borderRadius: '15px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+                    <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', color: '#2c5e50' }}>
+                        TUS DATOS
+                    </h2>
 
-                            {/* 2. Entrega */}
-                            <section>
-                                <h2 className={styles.sectionTitle}>2. Método de Entrega</h2>
-                                <div className={styles.radioGroup} style={{ marginBottom: '2rem' }}>
-                                    <label className={`${styles.radioOption} ${deliveryMethod === 'envio' ? styles.selected : ''}`}>
-                                        <input type="radio" name="delivery" className={styles.radioInput} checked={deliveryMethod === 'envio'} onChange={() => setDeliveryMethod('envio')} />
-                                        <div style={{ flex: 1 }}>
-                                            <span style={{ fontWeight: 600 }}>Envío a domicilio</span>
-                                            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Te lo llevamos a la puerta de tu casa.</div>
-                                        </div>
-                                        <span style={{ fontWeight: 600 }}>{cartTotal > 50000 ? 'GRATIS' : '$3.500'}</span>
-                                    </label>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.4rem', color: '#555', textTransform: 'uppercase' }}>
+                            Nombre Completo *
+                        </label>
+                        <input
+                            type="text"
+                            value={nombre}
+                            onChange={(e) => setNombre(e.target.value)}
+                            placeholder="Ej: Juan Perez"
+                            style={{
+                                width: '100%',
+                                padding: '1rem',
+                                border: '2px solid #ddd',
+                                borderRadius: '10px',
+                                fontSize: '1rem',
+                                fontFamily: 'inherit'
+                            }}
+                        />
+                    </div>
 
-                                    <label className={`${styles.radioOption} ${deliveryMethod === 'retiro' ? styles.selected : ''}`}>
-                                        <input type="radio" name="delivery" className={styles.radioInput} checked={deliveryMethod === 'retiro'} onChange={() => setDeliveryMethod('retiro')} />
-                                        <div>
-                                            <span style={{ fontWeight: 600 }}>Retiro en Local</span>
-                                            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Calle Falsa 123, Buenos Aires.</div>
-                                        </div>
-                                        <span style={{ fontWeight: 600, color: 'var(--success)' }}>GRATIS</span>
-                                    </label>
-                                </div>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.4rem', color: '#555', textTransform: 'uppercase' }}>
+                            WhatsApp / Teléfono *
+                        </label>
+                        <input
+                            type="tel"
+                            value={telefono}
+                            onChange={(e) => setTelefono(e.target.value)}
+                            placeholder="Ej: 11 1234 5678"
+                            style={{
+                                width: '100%',
+                                padding: '1rem',
+                                border: '2px solid #ddd',
+                                borderRadius: '10px',
+                                fontSize: '1rem',
+                                fontFamily: 'inherit'
+                            }}
+                        />
+                    </div>
 
-                                {deliveryMethod === 'envio' && (
-                                    <div className="fade-in">
-                                        <h3 className="h3" style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Dirección de envío</h3>
-                                        <div className={styles.inputGroup}>
-                                            <label className={styles.label}>Calle y Número</label>
-                                            <input required name="address" className={styles.input} value={formData.address} onChange={handleInputChange} />
-                                        </div>
-                                        <div className={styles.grid2}>
-                                            <div className={styles.inputGroup}>
-                                                <label className={styles.label}>Ciudad</label>
-                                                <input required name="city" className={styles.input} value={formData.city} onChange={handleInputChange} />
-                                            </div>
-                                            <div className={styles.inputGroup}>
-                                                <label className={styles.label}>Código Postal</label>
-                                                <input required name="zip" className={styles.input} value={formData.zip} onChange={handleInputChange} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </section>
+                    <div style={{ marginBottom: '0' }}>
+                        <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.4rem', color: '#555', textTransform: 'uppercase' }}>
+                            Email *
+                        </label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="tu@email.com"
+                            style={{
+                                width: '100%',
+                                padding: '1rem',
+                                border: '2px solid #ddd',
+                                borderRadius: '10px',
+                                fontSize: '1rem',
+                                fontFamily: 'inherit'
+                            }}
+                        />
+                    </div>
+                </div>
 
-                            {/* 3. Pago */}
-                            <section>
-                                <h2 className={styles.sectionTitle}>3. Método de Pago</h2>
-                                <div className={styles.radioGroup}>
-                                    <label className={`${styles.radioOption} ${paymentMethod === 'transferencia' ? styles.selected : ''}`}>
-                                        <input type="radio" name="payment" className={styles.radioInput} checked={paymentMethod === 'transferencia'} onChange={() => setPaymentMethod('transferencia')} />
-                                        <div>
-                                            <span style={{ fontWeight: 600 }}>Transferencia Bancaria</span>
-                                            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Datos bancarios al finalizar.</div>
-                                        </div>
-                                    </label>
+                {/* MÉTODO DE ENTREGA */}
+                <div style={{ background: 'white', borderRadius: '15px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+                    <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1rem', color: '#2c5e50' }}>
+                        ENTREGA
+                    </h2>
 
-                                    <label className={`${styles.radioOption} ${paymentMethod === 'efectivo' ? styles.selected : ''}`}>
-                                        <input type="radio" name="payment" className={styles.radioInput} checked={paymentMethod === 'efectivo'} onChange={() => setPaymentMethod('efectivo')} />
-                                        <div style={{ flex: 1 }}>
-                                            <span style={{ fontWeight: 600 }}>Efectivo (Contra entrega)</span>
-                                        </div>
-                                        <span className="badge badge-new" style={{ background: 'var(--success)', color: 'white' }}>10% OFF</span>
-                                    </label>
-                                </div>
-                            </section>
-
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        padding: '1rem',
+                        border: envio === 'envio' ? '2px solid #2c5e50' : '2px solid #eee',
+                        borderRadius: '10px',
+                        marginBottom: '0.75rem',
+                        background: envio === 'envio' ? 'rgba(44,94,80,0.05)' : 'white',
+                        cursor: 'pointer'
+                    }}>
+                        <input
+                            type="radio"
+                            checked={envio === 'envio'}
+                            onChange={() => setEnvio('envio')}
+                            style={{ width: '20px', height: '20px', accentColor: '#2c5e50' }}
+                        />
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Envío a Domicilio</div>
+                            <div style={{ fontSize: '0.85rem', color: '#666' }}>{cartTotal > 50000 ? 'GRATIS' : '$3.500'}</div>
                         </div>
+                    </label>
 
-                        {/* RIGHT COLUMN - SUMMARY */}
-                        <aside>
-                            <div className={styles.summaryCard}>
-                                <h3 className="h3" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>Resumen del Pedido</h3>
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        padding: '1rem',
+                        border: envio === 'retiro' ? '2px solid #2c5e50' : '2px solid #eee',
+                        borderRadius: '10px',
+                        background: envio === 'retiro' ? 'rgba(44,94,80,0.05)' : 'white',
+                        cursor: 'pointer'
+                    }}>
+                        <input
+                            type="radio"
+                            checked={envio === 'retiro'}
+                            onChange={() => setEnvio('retiro')}
+                            style={{ width: '20px', height: '20px', accentColor: '#2c5e50' }}
+                        />
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Retiro en Local</div>
+                            <div style={{ fontSize: '0.85rem', color: '#22c55e', fontWeight: 700 }}>GRATIS</div>
+                        </div>
+                    </label>
 
-                                <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '1.5rem', paddingRight: '0.5rem' }}>
-                                    {cart.map(item => (
-                                        <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
-                                            <span>{item.quantity}x {item.name}</span>
-                                            <span>${new Intl.NumberFormat('es-AR').format((isWholesale ? item.priceWholesale : item.priceRetail) * item.quantity)}</span>
-                                        </div>
-                                    ))}
+                    {envio === 'envio' && (
+                        <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #eee' }}>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.4rem', color: '#555', textTransform: 'uppercase' }}>
+                                    Dirección *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={direccion}
+                                    onChange={(e) => setDireccion(e.target.value)}
+                                    placeholder="Calle y Número"
+                                    style={{
+                                        width: '100%',
+                                        padding: '1rem',
+                                        border: '2px solid #ddd',
+                                        borderRadius: '10px',
+                                        fontSize: '1rem'
+                                    }}
+                                />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.4rem', color: '#555', textTransform: 'uppercase' }}>
+                                        Ciudad
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={ciudad}
+                                        onChange={(e) => setCiudad(e.target.value)}
+                                        placeholder="Tu ciudad"
+                                        style={{
+                                            width: '100%',
+                                            padding: '1rem',
+                                            border: '2px solid #ddd',
+                                            borderRadius: '10px',
+                                            fontSize: '1rem'
+                                        }}
+                                    />
                                 </div>
-
-                                <div className={styles.summaryRow}>
-                                    <span>Subtotal</span>
-                                    <span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span>
-                                </div>
-
-                                <div className={styles.summaryRow}>
-                                    <span>Envío</span>
-                                    <span>{shippingCost === 0 ? 'Gratis' : `$${new Intl.NumberFormat('es-AR').format(shippingCost)}`}</span>
-                                </div>
-
-                                {discountAmount > 0 && (
-                                    <div className={styles.summaryRow} style={{ color: 'var(--success)' }}>
-                                        <span>Descuento (Efectivo)</span>
-                                        <span>-${new Intl.NumberFormat('es-AR').format(discountAmount)}</span>
-                                    </div>
-                                )}
-
-                                <div className={`${styles.summaryRow} ${styles.total}`}>
-                                    <span>Total</span>
-                                    <span>${new Intl.NumberFormat('es-AR').format(finalTotal)}</span>
-                                </div>
-
-                                <button type="submit" className={`btn btn-primary ${styles.submitBtn}`}>
-                                    Finalizar Compra
-                                </button>
-
-                                <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                    Compra 100% Segura
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.4rem', color: '#555', textTransform: 'uppercase' }}>
+                                        CP
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={cp}
+                                        onChange={(e) => setCp(e.target.value)}
+                                        placeholder="Código postal"
+                                        style={{
+                                            width: '100%',
+                                            padding: '1rem',
+                                            border: '2px solid #ddd',
+                                            borderRadius: '10px',
+                                            fontSize: '1rem'
+                                        }}
+                                    />
                                 </div>
                             </div>
-                        </aside>
-
-                    </form>
+                        </div>
+                    )}
                 </div>
+
+                {/* FORMA DE PAGO */}
+                <div style={{ background: 'white', borderRadius: '15px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+                    <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1rem', color: '#2c5e50' }}>
+                        FORMA DE PAGO
+                    </h2>
+
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        padding: '1rem',
+                        border: pago === 'transferencia' ? '2px solid #2c5e50' : '2px solid #eee',
+                        borderRadius: '10px',
+                        marginBottom: '0.75rem',
+                        background: pago === 'transferencia' ? 'rgba(44,94,80,0.05)' : 'white',
+                        cursor: 'pointer'
+                    }}>
+                        <input
+                            type="radio"
+                            checked={pago === 'transferencia'}
+                            onChange={() => setPago('transferencia')}
+                            style={{ width: '20px', height: '20px', accentColor: '#2c5e50' }}
+                        />
+                        <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Transferencia Bancaria</span>
+                    </label>
+
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        padding: '1rem',
+                        border: pago === 'efectivo' ? '2px solid #2c5e50' : '2px solid #eee',
+                        borderRadius: '10px',
+                        background: pago === 'efectivo' ? 'rgba(44,94,80,0.05)' : 'white',
+                        cursor: 'pointer'
+                    }}>
+                        <input
+                            type="radio"
+                            checked={pago === 'efectivo'}
+                            onChange={() => setPago('efectivo')}
+                            style={{ width: '20px', height: '20px', accentColor: '#2c5e50' }}
+                        />
+                        <div>
+                            <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Efectivo (contra entrega)</div>
+                            <div style={{ fontSize: '0.85rem', color: '#22c55e', fontWeight: 800 }}>✓ 10% DE DESCUENTO</div>
+                        </div>
+                    </label>
+                </div>
+
+                {/* TOTAL */}
+                <div style={{ background: '#222', color: 'white', borderRadius: '15px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', opacity: 0.8, fontSize: '0.95rem' }}>
+                        <span>Subtotal:</span>
+                        <span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', opacity: 0.8, fontSize: '0.95rem' }}>
+                        <span>Envío:</span>
+                        <span>{costoEnvio === 0 ? 'GRATIS' : `$${new Intl.NumberFormat('es-AR').format(costoEnvio)}`}</span>
+                    </div>
+                    {descuento > 0 && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#22c55e', fontSize: '0.95rem' }}>
+                            <span>Descuento efectivo:</span>
+                            <span>-${new Intl.NumberFormat('es-AR').format(descuento)}</span>
+                        </div>
+                    )}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginTop: '1rem',
+                        paddingTop: '1rem',
+                        borderTop: '1px solid rgba(255,255,255,0.1)',
+                        fontSize: '1.5rem',
+                        fontWeight: 900,
+                        color: '#D4AF37'
+                    }}>
+                        <span>TOTAL:</span>
+                        <span>${new Intl.NumberFormat('es-AR').format(total)}</span>
+                    </div>
+                </div>
+
             </div>
+
+            {/* BOTÓN FIJO ABAJO */}
+            <div style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'white',
+                padding: '1rem',
+                boxShadow: '0 -10px 30px rgba(0,0,0,0.15)',
+                zIndex: 1000
+            }}>
+                <button
+                    onClick={enviarPedido}
+                    disabled={enviando}
+                    style={{
+                        width: '100%',
+                        padding: '1.2rem',
+                        background: enviando ? '#ccc' : '#D4AF37',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '15px',
+                        fontSize: '1.2rem',
+                        fontWeight: 900,
+                        cursor: enviando ? 'not-allowed' : 'pointer',
+                        boxShadow: '0 5px 20px rgba(212, 175, 55, 0.4)'
+                    }}
+                >
+                    {enviando ? 'ENVIANDO...' : 'CONFIRMAR PEDIDO 🚀'}
+                </button>
+            </div>
+
             <Footer />
         </>
     );
