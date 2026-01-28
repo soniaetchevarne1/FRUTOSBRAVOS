@@ -73,102 +73,32 @@
 .productsGrid {
     flex: 1;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
     gap: 1.25rem;
-}
-
-.productCard {
-    background: var(--surface);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-    transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-}
-
-.productCard:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-}
-
-.imageContainer {
-    height: 180px;
-    background: #f0f0f0;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #aaa;
-}
-
-.productInfo {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.productCategory {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-}
-
-.productName {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    line-height: 1.2;
-}
-
-.productPrice {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-top: auto;
-    margin-bottom: 1rem;
-}
-
-.addToCartBtn {
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--primary);
-    color: white;
-    border-radius: 8px;
-    font-weight: 500;
     transition: var(--transition);
 }
 
-.addToCartBtn:hover {
-    background: var(--primary-hover);
+.gridMode {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.listMode {
+    grid-template-columns: 1fr;
 }
 
 @media (max-width: 900px) {
-    .shopContainer {
-        flex-direction: column;
-    }
-
-    .filters {
-        width: 100%;
-        margin-bottom: 2rem;
-    }
-
-    .productsGrid.gridMode {
+    .gridMode {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
     }
 }
 
 @media (max-width: 600px) {
-    .productsGrid.gridMode {
+    .gridMode {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.5rem;
     }
 
-    .productsGrid.listMode {
+    .listMode {
         grid-template-columns: 1fr;
         gap: 1rem;
     }

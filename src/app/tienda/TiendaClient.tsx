@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Category, Product } from '@/lib/types';
@@ -242,15 +242,13 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
     const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-    // Persistence
-    useState(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('productViewMode');
-            if (saved === 'grid' || saved === 'list') {
-                setViewMode(saved);
-            }
+    // Persistence fix
+    useEffect(() => {
+        const saved = localStorage.getItem('productViewMode');
+        if (saved === 'grid' || saved === 'list') {
+            setViewMode(saved);
         }
-    });
+    }, []);
 
     const handleViewModeChange = (mode: 'grid' | 'list') => {
         setViewMode(mode);
@@ -344,10 +342,10 @@ export default function TiendaClient({ initialProducts }: { initialProducts: Pro
                                 <button
                                     className={`${styles.toggleBtn} ${viewMode === 'list' ? styles.active : ''}`}
                                     onClick={() => handleViewModeChange('list')}
-                                    title="Vista Lista"
+                                    title="Vista Líneas"
                                 >
                                     <List size={20} />
-                                    <span className={styles.toggleText}>Lista</span>
+                                    <span className={styles.toggleText}>Líneas</span>
                                 </button>
                             </div>
                         </div>
