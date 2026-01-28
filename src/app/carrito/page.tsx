@@ -269,7 +269,54 @@ export default function MobileCartPage() {
                             <span>${new Intl.NumberFormat('es-AR').format(finalTotal)}</span>
                         </div>
 
-                        <button type="submit" disabled={isLoading} className={styles.submitBtn}>
+                        <button
+                            type="button"
+                            disabled={isLoading}
+                            className={styles.submitBtn}
+                            onClick={async () => {
+                                if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email) {
+                                    alert("Por favor completa todos los datos obligatorios (*)");
+                                    return;
+                                }
+                                if (deliveryMethod === 'envio' && (!formData.address || !formData.city)) {
+                                    alert("Por favor completa la dirección de envío");
+                                    return;
+                                }
+
+                                setIsLoading(true);
+                                try {
+                                    const newOrder = {
+                                        id: crypto.randomUUID(),
+                                        customer: { ...formData },
+                                        deliveryMethod,
+                                        paymentMethod,
+                                        date: new Date().toISOString(),
+                                        items: cart.map(item => ({
+                                            productId: item.id,
+                                            productName: item.name,
+                                            quantity: item.quantity,
+                                            price: isWholesale ? item.priceWholesale : item.priceRetail,
+                                            image: item.image
+                                        })),
+                                        subtotal: cartTotal,
+                                        shippingCost: shippingCost,
+                                        discount: discountAmount,
+                                        total: finalTotal,
+                                        status: 'Pendiente' as const,
+                                        type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
+                                    };
+
+                                    await createOrderAction(newOrder);
+                                    alert("¡Pedido enviado con éxito! Nos comunicaremos pronto.");
+                                    clearCart();
+                                    window.location.href = '/tienda';
+                                } catch (error) {
+                                    alert("Error al enviar: " + (error instanceof Error ? error.message : "Desconocido"));
+                                } finally {
+                                    setIsLoading(false);
+                                }
+                            }}
+                        >
                             {isLoading ? 'PROCESANDO...' : 'CONFIRMAR PEDIDO 🚀'}
                         </button>
                         <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#888', marginTop: '1rem' }}>
