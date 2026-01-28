@@ -213,30 +213,41 @@ export async function getCustomers() {
     const orders = await getOrders();
     const customersMap = new Map();
 
+    if (!orders || !Array.isArray(orders)) return [];
+
     orders.forEach(order => {
+        if (!order || !order.customer || !order.customer.email) return;
+
         const email = order.customer.email.toLowerCase().trim();
         const existing = customersMap.get(email);
+        const orderTotal = order.total || 0;
+        const firstName = order.customer.firstName || '';
+        const lastName = order.customer.lastName || '';
+        const fullName = `${firstName} ${lastName}`.trim() || 'Cliente Sin Nombre';
 
         if (existing) {
-            existing.totalSpent += order.total;
+            existing.totalSpent += orderTotal;
             existing.orderCount += 1;
             // Keep the most recent info
-            if (new Date(order.date) > new Date(existing.lastOrderDate)) {
-                existing.lastOrderDate = order.date;
-                existing.phone = order.customer.phone;
-                existing.name = `${order.customer.firstName} ${order.customer.lastName}`;
+            const currentDate = new Date(order.date || 0);
+            const existingDate = new Date(existing.lastOrderDate || 0);
+
+            if (currentDate > existingDate) {
+                existing.lastOrderDate = order.date || new Date().toISOString();
+                existing.phone = order.customer.phone || existing.phone;
+                existing.name = fullName;
             }
         } else {
             customersMap.set(email, {
                 email,
-                name: `${order.customer.firstName} ${order.customer.lastName}`,
-                phone: order.customer.phone,
-                totalSpent: order.total,
+                name: fullName,
+                phone: order.customer.phone || 'Sin teléfono',
+                totalSpent: orderTotal,
                 orderCount: 1,
-                lastOrderDate: order.date
+                lastOrderDate: order.date || new Date().toISOString()
             });
         }
     });
 
-    return Array.from(customersMap.values()).sort((a, b) => b.totalSpent - a.totalSpent);
+    return Array.from(customersMap.values()).sort((a, b) => (b.totalSpent || 0) - (a.totalSpent || 0));
 }
