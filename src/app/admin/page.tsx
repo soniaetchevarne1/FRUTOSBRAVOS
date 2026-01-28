@@ -53,7 +53,7 @@ export default function AdminDashboard() {
                         {recentOrders.map(order => (
                             <tr key={order.id}>
                                 <td style={{ fontWeight: 500 }}>#{order.id}</td>
-                                <td>{order.customerName}</td>
+                                <td>{order.customer.firstName} {order.customer.lastName}</td>
                                 <td>{order.date}</td>
                                 <td style={{ fontWeight: 700 }}>${new Intl.NumberFormat('es-AR').format(order.total)}</td>
                                 <td>
