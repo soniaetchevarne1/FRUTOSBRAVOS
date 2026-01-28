@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useStore } from '@/context/StoreContext';
@@ -27,8 +27,12 @@ export default function MobileCartPage() {
 
     const [deliveryMethod, setDeliveryMethod] = useState<'envio' | 'retiro'>('envio');
     const [paymentMethod, setPaymentMethod] = useState<'transferencia' | 'efectivo'>('transferencia');
-    const [isSuccess, setIsSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Auto-scroll top when step changes
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [step]);
 
     const shippingCost = deliveryMethod === 'envio' ? (cartTotal > 50000 ? 0 : 3500) : 0;
     const discountAmount = paymentMethod === 'efectivo' ? cartTotal * 0.10 : 0;
@@ -39,33 +43,15 @@ export default function MobileCartPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    if (isSuccess) {
-        return (
-            <>
-                <Navbar />
-                <div className={styles.container} style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-                    <div style={{ width: '80px', height: '80px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem', color: 'white' }}>
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    </div>
-                    <h1 style={{ fontWeight: 900, marginBottom: '1rem' }}>¡PEDIDO ENVIADO!</h1>
-                    <p style={{ color: '#666', marginBottom: '2rem' }}>Nos pondremos en contacto contigo pronto.</p>
-                    <Link href="/tienda" className={styles.submitBtn}>VOLVER A LA TIENDA</Link>
-                </div>
-                <Footer />
-            </>
-        );
-    }
-
     if (cart.length === 0) {
         return (
             <>
                 <Navbar />
                 <div className={styles.container} style={{ textAlign: 'center', padding: '5rem 1rem' }}>
-                    <ShoppingBag size={64} style={{ color: '#ccc', marginBottom: '1.5rem' }} />
-                    <h2 style={{ fontWeight: 800 }}>TU CARRITO ESTÁ VACÍO</h2>
-                    <Link href="/tienda" className={styles.submitBtn} style={{ marginTop: '2rem' }}>IR A LA TIENDA</Link>
+                    <div style={{ fontSize: '4rem' }}>🛒</div>
+                    <h2 style={{ fontWeight: 800, margin: '1rem 0' }}>EL CARRITO ESTÁ VACÍO</h2>
+                    <p style={{ color: '#666', marginBottom: '2rem' }}>Agregá productos para continuar.</p>
+                    <Link href="/tienda" className={styles.submitBtn}>IR A LA TIENDA</Link>
                 </div>
                 <Footer />
             </>
@@ -73,142 +59,130 @@ export default function MobileCartPage() {
     }
 
     return (
-        <>
+        <div style={{ background: '#f8f9fa', minHeight: '100vh' }}>
             <Navbar />
+
             <div className={styles.container}>
 
-                {/* INDICADOR DE PASOS */}
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                    <div style={{
-                        padding: '0.4rem 1rem',
-                        borderRadius: '20px',
-                        background: step === 1 ? 'var(--primary)' : '#eee',
-                        color: step === 1 ? 'white' : '#666',
-                        fontSize: '0.8rem',
-                        fontWeight: 700
-                    }}>1. Resumen</div>
-                    <div style={{
-                        padding: '0.4rem 1rem',
-                        borderRadius: '20px',
-                        background: step === 2 ? 'var(--primary)' : '#eee',
-                        color: step === 2 ? 'white' : '#666',
-                        fontSize: '0.8rem',
-                        fontWeight: 700
-                    }}>2. Mis Datos</div>
+                {/* CABECERA DE PASOS */}
+                <div className={styles.stepHeader}>
+                    <div className={`${styles.stepIndicator} ${step >= 1 ? styles.stepActive : ''}`}>
+                        <div className={styles.stepNumber}>1</div>
+                        <span>CARRITO</span>
+                    </div>
+                    <div className={styles.stepLine} />
+                    <div className={`${styles.stepIndicator} ${step >= 2 ? styles.stepActive : ''}`}>
+                        <div className={styles.stepNumber}>2</div>
+                        <span>ENVÍO</span>
+                    </div>
                 </div>
 
                 {step === 1 ? (
-                    /* PASO 1: RESUMEN DE COMPRA */
-                    <div className="fade-in">
-                        <h1 className={styles.mainTitle}>TU COMPRA 🛒</h1>
+                    <div className={styles.contentWrapper}>
+                        <h1 className={styles.titleMobile}>Resumen de Compra</h1>
                         <div className={styles.card}>
-                            <h2 className={styles.cardTitle}><ShoppingBag size={20} /> Artículos Seleccionados</h2>
                             <div className={styles.itemList}>
                                 {cart.map((item) => (
-                                    <div key={item.id} className={styles.item}>
-                                        <div className={styles.itemImage}>
-                                            {item.image ? <img src={item.image} alt={item.name} /> : <span>🌰</span>}
+                                    <div key={item.id} className={styles.itemMobile}>
+                                        <div className={styles.itemImageMobile}>
+                                            {item.image ? <img src={item.image} alt={item.name} /> : <span>🥜</span>}
                                         </div>
-                                        <div className={styles.itemInfo}>
+                                        <div className={styles.itemDetailsMobile}>
                                             <h3>{item.name}</h3>
-                                            <div className={styles.itemControls}>
-                                                <div className={styles.quantityPicker}>
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)}><Minus size={14} /></button>
+                                            <div className={styles.itemRowMobile}>
+                                                <div className={styles.qtyBoxMobile}>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
                                                     <span>{item.quantity}</span>
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus size={14} /></button>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
                                                 </div>
-                                                <span className={styles.itemPrice}>
+                                                <span className={styles.priceMobile}>
                                                     ${new Intl.NumberFormat('es-AR').format((isWholesale ? item.priceWholesale : item.priceRetail) * item.quantity)}
                                                 </span>
                                             </div>
                                         </div>
-                                        <button className={styles.removeBtn} onClick={() => removeFromCart(item.id)}>
-                                            <Trash2 size={16} />
-                                        </button>
+                                        <button className={styles.trashBtn} onClick={() => removeFromCart(item.id)}><Trash2 size={18} /></button>
                                     </div>
                                 ))}
                             </div>
-                            <div className={styles.subtotalRow}>
-                                <span>Subtotal:</span>
-                                <span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span>
+
+                            <div className={styles.totalBoxMobile}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                    <span>Subtotal:</span>
+                                    <span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span>
+                                </div>
+                                <p style={{ fontSize: '0.8rem', color: '#666', margin: 0 }}>* No incluye costo de envío</p>
                             </div>
                         </div>
 
-                        <button
-                            className={styles.submitBtn}
-                            onClick={() => { setStep(2); window.scrollTo(0, 0); }}
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                        >
-                            CONFIRMAR Y CONTINUAR <ArrowRight size={20} />
-                        </button>
+                        <div className={styles.actionFixed}>
+                            <button
+                                className={styles.mainActionBtn}
+                                onClick={() => setStep(2)}
+                            >
+                                CONTINUAR AL ENVÍO <ArrowRight size={20} />
+                            </button>
+                        </div>
                     </div>
                 ) : (
-                    /* PASO 2: CARGA DE DATOS */
-                    <div className="fade-in">
-                        <button
-                            onClick={() => { setStep(1); window.scrollTo(0, 0); }}
-                            style={{ background: 'none', border: 'none', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, marginBottom: '1.5rem', cursor: 'pointer' }}
-                        >
-                            <ChevronLeft size={20} /> VOLVER AL CARRITO
+                    <div className={styles.contentWrapper}>
+                        <button className={styles.backBtn} onClick={() => setStep(1)}>
+                            <ChevronLeft size={20} /> MODIFICAR CARRITO
                         </button>
 
-                        <h1 className={styles.mainTitle}>DATOS DE ENVÍO 🚚</h1>
+                        <h1 className={styles.titleMobile}>Tus Datos</h1>
 
                         <div className={styles.card}>
-                            <h2 className={styles.cardTitle}><User size={20} /> Información Personal</h2>
-                            <div className={styles.grid}>
-                                <div className={styles.inputGroup}>
-                                    <label>Nombre *</label>
-                                    <input required name="firstName" value={formData.firstName} onChange={handleInputChange} placeholder="Tu nombre" />
-                                </div>
-                                <div className={styles.inputGroup}>
-                                    <label>Apellido *</label>
-                                    <input required name="lastName" value={formData.lastName} onChange={handleInputChange} placeholder="Tu apellido" />
-                                </div>
+                            <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1.5rem' }}>Completá con tus datos para que podamos coordinar la entrega.</p>
+
+                            <div className={styles.formGroupMobile}>
+                                <label>Nombre Completo *</label>
+                                <input name="firstName" value={formData.firstName} onChange={handleInputChange} placeholder="Ej: Juan Perez" />
                             </div>
-                            <div className={styles.inputGroup}>
-                                <label>WhatsApp *</label>
-                                <input required type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Ej: 11 1234 5678" />
+
+                            <div className={styles.formGroupMobile}>
+                                <label>WhatsApp / Teléfono *</label>
+                                <input name="phone" type="tel" value={formData.phone} onChange={handleInputChange} placeholder="Ej: 11 1234 5678" />
                             </div>
-                            <div className={styles.inputGroup}>
+
+                            <div className={styles.formGroupMobile}>
                                 <label>Email *</label>
-                                <input required type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="tu@email.com" />
+                                <input name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="tu@email.com" />
                             </div>
                         </div>
 
                         <div className={styles.card}>
-                            <h2 className={styles.cardTitle}><Truck size={20} /> Método de Entrega</h2>
-                            <div className={styles.radioGroup}>
-                                <label className={`${styles.radioCard} ${deliveryMethod === 'envio' ? styles.active : ''}`}>
+                            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1rem' }}>Entrega</h2>
+                            <div className={styles.optsList}>
+                                <label className={`${styles.optItem} ${deliveryMethod === 'envio' ? styles.optActive : ''}`}>
                                     <input type="radio" checked={deliveryMethod === 'envio'} onChange={() => setDeliveryMethod('envio')} />
-                                    <div className={styles.radioContent}>
+                                    <div>
                                         <strong>Envío a Domicilio</strong>
-                                        <span>{cartTotal > 50000 ? 'GRATIS' : '$3.500'}</span>
+                                        <small>{cartTotal > 50000 ? 'GRATIS' : '$3.500'}</small>
                                     </div>
                                 </label>
-                                <label className={`${styles.radioCard} ${deliveryMethod === 'retiro' ? styles.active : ''}`}>
+                                <label className={`${styles.optItem} ${deliveryMethod === 'retiro' ? styles.optActive : ''}`}>
                                     <input type="radio" checked={deliveryMethod === 'retiro'} onChange={() => setDeliveryMethod('retiro')} />
-                                    <div className={styles.radioContent}>
+                                    <div>
                                         <strong>Retiro en Local</strong>
-                                        <span>GRATIS</span>
+                                        <small>GRATIS</small>
                                     </div>
                                 </label>
                             </div>
 
                             {deliveryMethod === 'envio' && (
-                                <div className={styles.addressFields}>
-                                    <div className={styles.inputGroup}>
+                                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #eee' }}>
+                                    <div className={styles.formGroupMobile}>
                                         <label>Calle y Número *</label>
-                                        <input required name="address" value={formData.address} onChange={handleInputChange} placeholder="Ej. Calle 123" />
+                                        <input name="address" value={formData.address} onChange={handleInputChange} placeholder="Ej: Av. Rivadavia 123" />
                                     </div>
-                                    <div className={styles.grid}>
-                                        <div className={styles.inputGroup}>
-                                            <label>Ciudad *</label>
-                                            <input required name="city" value={formData.city} onChange={handleInputChange} placeholder="Tu ciudad" />
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div className={styles.formGroupMobile}>
+                                            <label>Ciudad</label>
+                                            <input name="city" value={formData.city} onChange={handleInputChange} />
                                         </div>
-                                        <div className={styles.inputGroup}>
-                                            <label>CP *</label>
-                                            <input required name="zip" value={formData.zip} onChange={handleInputChange} placeholder="CP" />
+                                        <div className={styles.formGroupMobile}>
+                                            <label>CP</label>
+                                            <input name="zip" value={formData.zip} onChange={handleInputChange} />
                                         </div>
                                     </div>
                                 </div>
@@ -216,44 +190,45 @@ export default function MobileCartPage() {
                         </div>
 
                         <div className={styles.card}>
-                            <h2 className={styles.cardTitle}><CreditCard size={20} /> Pago</h2>
-                            <div className={styles.radioGroup}>
-                                <label className={`${styles.radioCard} ${paymentMethod === 'transferencia' ? styles.active : ''}`}>
+                            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1rem' }}>Pago</h2>
+                            <div className={styles.optsList}>
+                                <label className={`${styles.optItem} ${paymentMethod === 'transferencia' ? styles.optActive : ''}`}>
                                     <input type="radio" checked={paymentMethod === 'transferencia'} onChange={() => setPaymentMethod('transferencia')} />
-                                    <div className={styles.radioContent}>
-                                        <strong>Transferencia</strong>
-                                        <span>Lista</span>
-                                    </div>
+                                    <span>Transferencia Bancaria</span>
                                 </label>
-                                <label className={`${styles.radioCard} ${paymentMethod === 'efectivo' ? styles.active : ''}`}>
+                                <label className={`${styles.optItem} ${paymentMethod === 'efectivo' ? styles.optActive : ''}`}>
                                     <input type="radio" checked={paymentMethod === 'efectivo'} onChange={() => setPaymentMethod('efectivo')} />
-                                    <div className={styles.radioContent}>
-                                        <strong>Efectivo</strong>
-                                        <span style={{ color: '#22c55e' }}>10% OFF</span>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span>Efectivo (Contra entrega)</span>
+                                        <small style={{ color: '#22c55e', fontWeight: 800 }}>10% DE DESCUENTO</small>
                                     </div>
                                 </label>
                             </div>
                         </div>
 
-                        <div className={styles.totalCard}>
-                            <div className={styles.totalRow}><span>Subtotal</span><span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span></div>
-                            <div className={styles.totalRow}><span>Envío</span><span>{shippingCost === 0 ? 'GRATIS' : `$${new Intl.NumberFormat('es-AR').format(shippingCost)}`}</span></div>
-                            {discountAmount > 0 && <div className={styles.totalRow} style={{ color: '#22c55e' }}><span>Efectivo -10%</span><span>-${new Intl.NumberFormat('es-AR').format(discountAmount)}</span></div>}
-                            <div className={styles.finalTotal}><span>TOTAL</span><span>${new Intl.NumberFormat('es-AR').format(finalTotal)}</span></div>
+                        <div className={styles.grandTotalCard}>
+                            <div className={styles.totalRowMobile}><span>Subtotal:</span><span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span></div>
+                            <div className={styles.totalRowMobile}><span>Envío:</span><span>{shippingCost === 0 ? 'GRATIS' : `$${new Intl.NumberFormat('es-AR').format(shippingCost)}`}</span></div>
+                            {discountAmount > 0 && <div className={styles.totalRowMobile} style={{ color: '#22c55e' }}><span>Ahorro Efectivo:</span><span>-${new Intl.NumberFormat('es-AR').format(discountAmount)}</span></div>}
+                            <div className={styles.finalTotalMobile}>
+                                <span>TOTAL:</span>
+                                <span>${new Intl.NumberFormat('es-AR').format(finalTotal)}</span>
+                            </div>
+                        </div>
 
+                        <div className={styles.actionFixed}>
                             <button
-                                type="button"
+                                className={styles.mainActionBtn}
                                 disabled={isLoading}
-                                className={styles.submitBtn}
                                 onClick={async () => {
                                     if (!formData.firstName || !formData.phone || !formData.email) {
-                                        alert("Por favor completa los campos obligatorios");
+                                        alert("Por favor completá Nombre, WhatsApp y Email");
                                         return;
                                     }
                                     setIsLoading(true);
                                     try {
                                         const newOrder = {
-                                            id: crypto.randomUUID(),
+                                            id: "ORDER-" + Date.now(), // No crypto.uuid for better compatibility
                                             customer: { ...formData },
                                             deliveryMethod,
                                             paymentMethod,
@@ -263,7 +238,6 @@ export default function MobileCartPage() {
                                                 productName: item.name,
                                                 quantity: item.quantity,
                                                 price: isWholesale ? item.priceWholesale : item.priceRetail,
-                                                image: item.image
                                             })),
                                             subtotal: cartTotal,
                                             shippingCost,
@@ -273,11 +247,11 @@ export default function MobileCartPage() {
                                             type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
                                         };
                                         await createOrderAction(newOrder);
-                                        alert("¡PEDIDO REALIZADO! Gracias.");
+                                        alert("¡PEDIDO ENVIADO! Pronto nos comunicaremos.");
                                         clearCart();
                                         window.location.href = '/tienda';
                                     } catch (e) {
-                                        alert("Error al enviar pedido.");
+                                        alert("Error al enviar el pedido.");
                                     } finally {
                                         setIsLoading(false);
                                     }
@@ -288,9 +262,8 @@ export default function MobileCartPage() {
                         </div>
                     </div>
                 )}
-
             </div>
             <Footer />
-        </>
+        </div>
     );
 }
