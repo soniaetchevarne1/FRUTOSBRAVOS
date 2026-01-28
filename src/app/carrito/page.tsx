@@ -41,53 +41,6 @@ export default function MobileCartPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-
-        const newOrder = {
-            id: crypto.randomUUID(),
-            customer: {
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                email: formData.email,
-                phone: formData.phone,
-                dni: formData.dni,
-                address: formData.address,
-                city: formData.city,
-                zip: formData.zip
-            },
-            deliveryMethod,
-            paymentMethod,
-            date: new Date().toISOString(),
-            items: cart.map(item => ({
-                productId: item.id,
-                productName: item.name,
-                quantity: item.quantity,
-                price: isWholesale ? item.priceWholesale : item.priceRetail,
-                image: item.image
-            })),
-            subtotal: cartTotal,
-            shippingCost: shippingCost,
-            discount: discountAmount,
-            total: finalTotal,
-            status: 'Pendiente' as const,
-            type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
-        };
-
-        try {
-            await createOrderAction(newOrder);
-            setIsSuccess(true);
-            clearCart();
-            window.scrollTo(0, 0);
-        } catch (error) {
-            console.error('Error creating order:', error);
-            alert('Hubo un error al procesar tu pedido. Por favor intenta nuevamente.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     if (isSuccess) {
         return (
             <>
@@ -130,44 +83,10 @@ export default function MobileCartPage() {
             <div className={styles.container}>
                 <h1 className={styles.mainTitle}>MI PEDIDO 🛒</h1>
 
-                {/* 1. RESUMEN DE PRODUCTOS */}
-                <div className={styles.card}>
-                    <h2 className={styles.cardTitle}><ShoppingBag size={20} /> Resumen de Compra</h2>
-                    <div className={styles.itemList}>
-                        {cart.map((item) => (
-                            <div key={item.id} className={styles.item}>
-                                <div className={styles.itemImage}>
-                                    {item.image ? <img src={item.image} alt={item.name} /> : <span>🌰</span>}
-                                </div>
-                                <div className={styles.itemInfo}>
-                                    <h3>{item.name}</h3>
-                                    <div className={styles.itemControls}>
-                                        <div className={styles.quantityPicker}>
-                                            <button onClick={() => updateQuantity(item.id, item.quantity - 1)}><Minus size={14} /></button>
-                                            <span>{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus size={14} /></button>
-                                        </div>
-                                        <span className={styles.itemPrice}>
-                                            ${new Intl.NumberFormat('es-AR').format((isWholesale ? item.priceWholesale : item.priceRetail) * item.quantity)}
-                                        </span>
-                                    </div>
-                                </div>
-                                <button className={styles.removeBtn} onClick={() => removeFromCart(item.id)}>
-                                    <Trash2 size={16} />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                    <div className={styles.subtotalRow}>
-                        <span>Subtotal:</span>
-                        <span>${new Intl.NumberFormat('es-AR').format(cartTotal)}</span>
-                    </div>
-                </div>
-
-                <form onSubmit={handleSubmit}>
-                    {/* 2. DATOS DE ENVIO */}
-                    <div className={styles.card}>
-                        <h2 className={styles.cardTitle}><User size={20} /> Mis Datos</h2>
+                <form>
+                    {/* 1. DATOS DE ENVIO (PRIMARY ON MOBILE) */}
+                    <div className={styles.card} style={{ borderTop: '4px solid #D4AF37' }}>
+                        <h2 className={styles.cardTitle}><User size={20} /> PASO 1: MIS DATOS</h2>
                         <div className={styles.grid}>
                             <div className={styles.inputGroup}>
                                 <label>Nombre *</label>
@@ -188,8 +107,9 @@ export default function MobileCartPage() {
                         </div>
                     </div>
 
+                    {/* 2. ENTREGA */}
                     <div className={styles.card}>
-                        <h2 className={styles.cardTitle}><Truck size={20} /> Entrega</h2>
+                        <h2 className={styles.cardTitle}><Truck size={20} /> PASO 2: ENTREGA</h2>
                         <div className={styles.radioGroup}>
                             <label className={`${styles.radioCard} ${deliveryMethod === 'envio' ? styles.active : ''}`}>
                                 <input type="radio" checked={deliveryMethod === 'envio'} onChange={() => setDeliveryMethod('envio')} />
@@ -229,7 +149,7 @@ export default function MobileCartPage() {
 
                     {/* 3. PAGO */}
                     <div className={styles.card}>
-                        <h2 className={styles.cardTitle}><CreditCard size={20} /> Pago</h2>
+                        <h2 className={styles.cardTitle}><CreditCard size={20} /> PASO 3: PAGO</h2>
                         <div className={styles.radioGroup}>
                             <label className={`${styles.radioCard} ${paymentMethod === 'transferencia' ? styles.active : ''}`}>
                                 <input type="radio" checked={paymentMethod === 'transferencia'} onChange={() => setPaymentMethod('transferencia')} />
@@ -248,7 +168,7 @@ export default function MobileCartPage() {
                         </div>
                     </div>
 
-                    {/* TOTAL Y BOTON FINAL */}
+                    {/* 4. TOTAL Y BOTON FINAL */}
                     <div className={styles.totalCard}>
                         <div className={styles.totalRow}>
                             <span>Subtotal</span>
@@ -275,11 +195,11 @@ export default function MobileCartPage() {
                             className={styles.submitBtn}
                             onClick={async () => {
                                 if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email) {
-                                    alert("Por favor completa todos los datos obligatorios (*)");
+                                    alert("Por favor completa tus datos (Nombre, Apellido, Teléfono y Email)");
                                     return;
                                 }
                                 if (deliveryMethod === 'envio' && (!formData.address || !formData.city)) {
-                                    alert("Por favor completa la dirección de envío");
+                                    alert("Por favor completa tu dirección para el envío");
                                     return;
                                 }
 
@@ -307,23 +227,41 @@ export default function MobileCartPage() {
                                     };
 
                                     await createOrderAction(newOrder);
-                                    alert("¡Pedido enviado con éxito! Nos comunicaremos pronto.");
+                                    alert("¡PEDIDO RECIBIDO! Nos pondremos en contacto contigo pronto por WhatsApp.");
                                     clearCart();
                                     window.location.href = '/tienda';
                                 } catch (error) {
-                                    alert("Error al enviar: " + (error instanceof Error ? error.message : "Desconocido"));
+                                    alert("Error al enviar el pedido. Por favor intenta de nuevo.");
                                 } finally {
                                     setIsLoading(false);
                                 }
                             }}
                         >
-                            {isLoading ? 'PROCESANDO...' : 'CONFIRMAR PEDIDO 🚀'}
+                            {isLoading ? 'ENVIANDO...' : 'ENVIAR MI PEDIDO 🚀'}
                         </button>
-                        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#888', marginTop: '1rem' }}>
-                            Al confirmar, recibirás un mensaje con los datos para concretar tu compra.
-                        </p>
                     </div>
                 </form>
+
+                {/* RESUMEN DE PRODUCTOS (AT THE END ON MOBILE) */}
+                <div className={styles.card} style={{ marginTop: '3rem', background: '#fcfcfc' }}>
+                    <h2 className={styles.cardTitle} style={{ fontSize: '0.9rem', color: '#888' }}><ShoppingBag size={16} /> Tu Bolsa</h2>
+                    <div className={styles.itemList}>
+                        {cart.map((item) => (
+                            <div key={item.id} className={styles.item} style={{ padding: '0.5rem 0' }}>
+                                <div className={styles.itemImage} style={{ width: '40px', height: '40px' }}>
+                                    {item.image ? <img src={item.image} alt={item.name} /> : <span>🌰</span>}
+                                </div>
+                                <div className={styles.itemInfo}>
+                                    <h3 style={{ fontSize: '0.85rem' }}>{item.quantity}x {item.name}</h3>
+                                </div>
+                                <span className={styles.itemPrice} style={{ fontSize: '0.85rem' }}>
+                                    ${new Intl.NumberFormat('es-AR').format((isWholesale ? item.priceWholesale : item.priceRetail) * item.quantity)}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
             </div>
             <Footer />
         </>
