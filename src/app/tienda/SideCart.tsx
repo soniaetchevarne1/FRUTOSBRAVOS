@@ -165,6 +165,7 @@ export default function SideCart({ isOpen, onClose }: { isOpen: boolean, onClose
                 {/* Footer / Total */}
                 <div style={{
                     padding: '1.25rem 1rem',
+                    paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))',
                     borderTop: '1px solid #f0f0f0',
                     backgroundColor: '#fff',
                     display: 'flex',
