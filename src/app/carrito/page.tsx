@@ -167,15 +167,22 @@ export default function CarritoPage() {
                     marginTop: '2rem'
                 }}>
                     <Link href="/tienda" style={{
+                        display: 'inline-block',
+                        width: '80%',
+                        maxWidth: '300px',
+                        padding: '0.8rem',
+                        border: '2px solid #2c5e50',
                         color: '#2c5e50',
+                        background: 'white',
+                        borderRadius: '12px',
                         textDecoration: 'none',
-                        fontWeight: 700,
+                        fontWeight: 800,
                         fontSize: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
+                        textAlign: 'center',
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 2px 10px rgba(44, 94, 80, 0.1)'
                     }}>
-                        ← CONTINUAR COMPRANDO
+                        🛒 SEGUIR AGREGANDO PRODUCTOS
                     </Link>
 
                     <Link
