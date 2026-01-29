@@ -38,15 +38,19 @@ export default function CheckoutPage() {
         setEnviando(true);
 
         try {
-            console.log('Procesando pedido v2.5...');
+            console.log('Procesando pedido v2.6...');
             const pedidoId = 'PED-' + Date.now();
+
+            // Validar que los campos numéricos sean correctos (Evitar NaN)
+            const safeCartTotal = Number(cartTotal) || 0;
+            const safeTotal = Number(total) || 0;
 
             const pedido = {
                 id: pedidoId,
                 customer: {
                     firstName: nombre,
                     lastName: '',
-                    email: email.trim().toLowerCase(),
+                    email: (email || '').trim().toLowerCase(),
                     phone: telefono,
                     dni: '',
                     address: direccion,
@@ -57,40 +61,21 @@ export default function CheckoutPage() {
                 paymentMethod: pago,
                 date: new Date().toISOString(),
                 items: cart.map(item => ({
-                    productId: item.id,
-                    productName: item.name,
-                    quantity: item.quantity,
-                    price: isWholesale ? (item.priceWholesale || 0) : (item.priceRetail || 0),
+                    productId: item.id || 'N/A',
+                    productName: item.name || 'Producto',
+                    quantity: Number(item.quantity) || 1,
+                    price: Number(isWholesale ? (item.priceWholesale || 0) : (item.priceRetail || 0)),
                 })),
-                subtotal: cartTotal,
-                shippingCost: costoEnvio,
-                discount: descuento,
-                total: total,
+                subtotal: safeCartTotal,
+                shippingCost: Number(costoEnvio) || 0,
+                discount: Number(descuento) || 0,
+                total: safeTotal,
                 status: 'Pendiente' as const,
                 type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
             };
 
-            // 1. Intentar guardar en base de datos PRIMERO con un timeout o manejo robusto
-            // Await the action to ensure it's processed before we leave the page
-            console.log('Guardando pedido en base de datos...');
-            try {
-                const res = await createOrderAction(pedido);
-                if (res && !res.success) {
-                    console.warn('Advertencia al guardar orden:', res.error);
-                }
-            } catch (serverError: any) {
-                console.error('Error contactando al servidor (no fatal para el cliente):', serverError);
-                // No detenemos el flujo hacia WhatsApp si falla la DB, 
-                // pero lo registramos.
-            }
-
-            // 2. Formatear mensaje para WhatsApp con encoding seguro
-            const currencyFormatter = new Intl.NumberFormat('es-AR', {
-                style: 'currency',
-                currency: 'ARS',
-                minimumFractionDigits: 0
-            });
-
+            // 1. Formatear mensaje para WhatsApp ANTES de intentar guardar
+            // Si algo falla después, ya tenemos el mensaje listo.
             const itemsText = cart.map(item => `- ${item.name} x${item.quantity}`).join('\n');
             const rawMessage = `¡Hola! Acabo de realizar un pedido en SONIA APP 🚀\n\n` +
                 `*Pedido:* ${pedidoId}\n` +
@@ -99,26 +84,31 @@ export default function CheckoutPage() {
                 `*Entrega:* ${envio === 'envio' ? 'Envío a domicilio' : 'Retiro en local'}\n` +
                 `*Pago:* ${pago}\n\n` +
                 `*Detalle:*\n${itemsText}\n\n` +
-                `*TOTAL: ${currencyFormatter.format(total)}*`;
+                `*TOTAL: $${new Intl.NumberFormat('es-AR').format(safeTotal)}*`;
 
             const whatsappNumber = "5493416091224";
             const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(rawMessage)}`;
 
-            // 3. Limpiar carrito localmente antes de irse
+            // 2. Intentar guardar en base de datos (con timeout de 4 segundos)
+            console.log('Sincronizando con el servidor...');
+            try {
+                // No bloqueamos el flujo si el servidor tarda demasiado
+                await Promise.race([
+                    createOrderAction(pedido),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout de Servidor')), 4000))
+                ]);
+            } catch (serverError: any) {
+                console.warn('El servidor no respondió a tiempo o falló, procediendo a WhatsApp igualmente:', serverError.message);
+            }
+
+            // 3. Limpiar carrito y Redirigir
             clearCart();
-
-            // 4. REDIRIGIR A WHATSAPP
-            // Usamos location.href porque es más confiable en móviles que window.open
-            console.log('Redirigiendo a WhatsApp...');
-
-            // Avisar al usuario brevemente si estamos en mobile o como fallback
-            alert('¡Pedido Procesado! 🚀\n\nAhora te redirigiremos a WhatsApp para finalizar el envío.');
-
+            alert('¡PEDIDO RECIBIDO! 🚀\n\nAhora te redirigiremos a WhatsApp para finalizar.');
             window.location.href = waUrl;
 
         } catch (error: any) {
-            console.error('Error crítico en flujo v2.5:', error);
-            alert('❌ ERROR AL PROCESAR EL PEDIDO:\n' + (error.message || 'Error técnico desconocido. Por favor intenta nuevamente o contactanos por WhatsApp directamente.'));
+            console.error('Error crítico v2.6:', error);
+            alert('❌ HUBO UN PROBLEMA:\n' + (error.message || 'Error desconocido') + '\n\nPor favor intenta nuevamente o envíanos una captura de pantalla.');
         } finally {
             setEnviando(false);
         }
@@ -469,7 +459,7 @@ export default function CheckoutPage() {
                             marginTop: '1rem'
                         }}
                     >
-                        {enviando ? 'PROCESANDO...' : 'ENVIAR PEDIDO 🚀 (v2.5)'}
+                        {enviando ? 'PROCESANDO...' : 'ENVIAR PEDIDO 🚀 (v2.6)'}
                     </button>
                 </div>
             </div>

@@ -95,8 +95,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
     const cartTotal = cart.reduce((acc, item) => {
-        const price = isWholesale ? item.priceWholesale : item.priceRetail;
-        return acc + price * item.quantity;
+        const price = isWholesale ? (item.priceWholesale || 0) : (item.priceRetail || 0);
+        return acc + (Number(price) || 0) * (item.quantity || 0);
     }, 0);
 
     return (
