@@ -25,7 +25,7 @@ export default function CheckoutPage() {
     const descuento = pago === 'efectivo' ? cartTotal * 0.10 : 0;
     const total = cartTotal + costoEnvio - descuento;
 
-    const enviarPedido = async () => {
+    const enviarPedido = () => {
         if (!nombre || !telefono || !email) {
             alert('Por favor completa Nombre, Teléfono y Email');
             return;
@@ -38,12 +38,10 @@ export default function CheckoutPage() {
         setEnviando(true);
 
         try {
-            console.log('Procesando pedido v2.6...');
+            console.log('Procesando pedido v2.7 (Instantáneo)...');
             const pedidoId = 'PED-' + Date.now();
 
-            // Validar que los campos numéricos sean correctos (Evitar NaN)
-            const safeCartTotal = Number(cartTotal) || 0;
-            const safeTotal = Number(total) || 0;
+            const safeTotalValue = Number(total) || 0;
 
             const pedido = {
                 id: pedidoId,
@@ -66,49 +64,36 @@ export default function CheckoutPage() {
                     quantity: Number(item.quantity) || 1,
                     price: Number(isWholesale ? (item.priceWholesale || 0) : (item.priceRetail || 0)),
                 })),
-                subtotal: safeCartTotal,
+                subtotal: Number(cartTotal) || 0,
                 shippingCost: Number(costoEnvio) || 0,
                 discount: Number(descuento) || 0,
-                total: safeTotal,
+                total: safeTotalValue,
                 status: 'Pendiente' as const,
                 type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
             };
 
-            // 1. Formatear mensaje para WhatsApp ANTES de intentar guardar
-            // Si algo falla después, ya tenemos el mensaje listo.
+            // 1. PREPARAR WHATSAPP
             const itemsText = cart.map(item => `- ${item.name} x${item.quantity}`).join('\n');
             const rawMessage = `¡Hola! Acabo de realizar un pedido en SONIA APP 🚀\n\n` +
                 `*Pedido:* ${pedidoId}\n` +
-                `*Cliente:* ${nombre}\n` +
-                `*Teléfono:* ${telefono}\n` +
-                `*Entrega:* ${envio === 'envio' ? 'Envío a domicilio' : 'Retiro en local'}\n` +
-                `*Pago:* ${pago}\n\n` +
+                `*Cliente:* ${nombre}\n\n` +
                 `*Detalle:*\n${itemsText}\n\n` +
-                `*TOTAL: $${new Intl.NumberFormat('es-AR').format(safeTotal)}*`;
+                `*TOTAL: $${safeTotalValue}*`;
 
             const whatsappNumber = "5493416091224";
             const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(rawMessage)}`;
 
-            // 2. Intentar guardar en base de datos (con timeout de 4 segundos)
-            console.log('Sincronizando con el servidor...');
-            try {
-                // No bloqueamos el flujo si el servidor tarda demasiado
-                await Promise.race([
-                    createOrderAction(pedido),
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout de Servidor')), 4000))
-                ]);
-            } catch (serverError: any) {
-                console.warn('El servidor no respondió a tiempo o falló, procediendo a WhatsApp igualmente:', serverError.message);
-            }
+            // 2. DISPARAR GUARDADO EN SEGUNDO PLANO
+            createOrderAction(pedido).catch(e => console.error("Error background save:", e));
 
-            // 3. Limpiar carrito y Redirigir
+            // 3. LIMPIAR Y REDIRIGIR AL INSTANTE
             clearCart();
-            alert('¡PEDIDO RECIBIDO! 🚀\n\nAhora te redirigiremos a WhatsApp para finalizar.');
+
             window.location.href = waUrl;
 
         } catch (error: any) {
-            console.error('Error crítico v2.6:', error);
-            alert('❌ HUBO UN PROBLEMA:\n' + (error.message || 'Error desconocido') + '\n\nPor favor intenta nuevamente o envíanos una captura de pantalla.');
+            console.error('Error crítico v2.7:', error);
+            alert('❌ ERROR AL ENVIAR:\n' + (error.message || 'Error técnico'));
         } finally {
             setEnviando(false);
         }
@@ -459,7 +444,7 @@ export default function CheckoutPage() {
                             marginTop: '1rem'
                         }}
                     >
-                        {enviando ? 'PROCESANDO...' : 'ENVIAR PEDIDO 🚀 (v2.6)'}
+                        {enviando ? 'PROCESANDO...' : 'ENVIAR PEDIDO 🚀 (v2.7)'}
                     </button>
                 </div>
             </div>
