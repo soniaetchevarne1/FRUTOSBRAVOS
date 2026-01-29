@@ -142,7 +142,7 @@ export default function Home() {
         <section className="section" style={{ background: 'linear-gradient(135deg, #fdfdfb 0%, #fff5e6 100%)', borderTop: '3px solid var(--secondary)' }}>
           <div className="container">
             <h2 className="h2" style={{ textAlign: 'center', marginBottom: '3rem', fontSize: '2.5rem' }}>
-              ⚡ <span style={{ color: 'var(--primary)' }}>Súper Poderes</span> Fruto Bravo
+              ⚡ <span style={{ color: 'var(--primary)' }}>Súper Poderes</span> Frutos Bravos
             </h2>
             <div className={`grid-cols-3 ${styles.propsGrid}`}>
               <div className={`${styles.propCard} ${styles.powerCard}`}>

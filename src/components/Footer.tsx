@@ -9,7 +9,10 @@ export default function Footer() {
                 <div className={styles.grid}>
                     {/* Brand */}
                     <div className={styles.column}>
-                        <h3 className={styles.heading}>SONIA</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                            <img src="/logo-fruto-bravo.png" alt="Frutos Bravos Logo" style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
+                            <h3 className={styles.heading} style={{ margin: 0 }}>FRUTOS BRAVOS</h3>
+                        </div>
                         <p className={styles.text}>
                             Alimentos saludables, frescos y de la mejor calidad. Venta mayorista y minorista.
                         </p>
@@ -30,7 +33,7 @@ export default function Footer() {
                     <div className={styles.column}>
                         <h4 className={styles.subheading}>Contacto</h4>
                         <ul className={styles.contactList}>
-                            <li><Mail size={16} /> info@sonia.com.ar</li>
+                            <li><Mail size={16} /> info@frutosbravos.com.ar</li>
                             <li><Phone size={16} /> +54 9 11 1234 5678</li>
                             <li><MapPin size={16} /> Buenos Aires, Argentina</li>
                         </ul>
@@ -47,7 +50,7 @@ export default function Footer() {
                 </div>
 
                 <div className={styles.copyright}>
-                    &copy; {new Date().getFullYear()} Sonia Alimentos Saludables. Todos los derechos reservados.
+                    &copy; {new Date().getFullYear()} Frutos Bravos Alimentos Saludables. Todos los derechos reservados.
                 </div>
             </div>
         </footer>

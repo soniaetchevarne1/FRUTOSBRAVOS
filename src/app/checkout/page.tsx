@@ -73,7 +73,7 @@ export default function CheckoutPage() {
 
             // 1. PREPARAR LINK DE WHATSAPP
             const itemsText = cart.map(item => `- ${item.name} x${item.quantity}`).join('\n');
-            const rawMessage = `¡Hola! Nuevo Pedido SONIA APP 🚀\n` +
+            const rawMessage = `¡Hola! Nuevo Pedido FRUTOS BRAVOS 🚀\n` +
                 `*Pedido:* ${pedidoId}\n` +
                 `*Cliente:* ${nombre}\n\n` +
                 `*Detalle:*\n${itemsText}\n\n` +

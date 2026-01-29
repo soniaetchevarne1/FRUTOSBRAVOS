@@ -48,7 +48,7 @@ export default async function AdminLayout({
                         style={{ width: '40px', height: '40px', borderRadius: '50%', border: '2px solid white' }}
                     />
                     <div style={{ lineHeight: 1 }}>
-                        <span style={{ fontSize: '1rem', fontWeight: 900 }}>FRUTO BRAVO</span>
+                        <span style={{ fontSize: '1rem', fontWeight: 900 }}>FRUTOS BRAVOS</span>
                         <span style={{ color: 'var(--secondary)', fontSize: '0.6rem', display: 'block', fontWeight: 800 }}>ADMIN</span>
                     </div>
                 </div>

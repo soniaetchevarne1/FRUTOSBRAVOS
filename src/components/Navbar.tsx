@@ -15,7 +15,7 @@ export default function Navbar() {
             <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '100%' }}>
                 <Link href="/" className={styles.logoWrapper}>
                     <img src="/logo-fruto-bravo.png" alt="Fruto Bravo Logo" className={styles.logoImg} />
-                    <span className={styles.logoText}>FRUTO BRAVO</span>
+                    <span className={styles.logoText}>FRUTOS BRAVOS</span>
                 </Link>
 
                 {/* Desktop Menu */}
