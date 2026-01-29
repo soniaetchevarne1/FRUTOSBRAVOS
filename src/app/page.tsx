@@ -128,20 +128,8 @@ export default function Home() {
                   </div>
                   <div className={styles.favInfoContainer}>
                     <h3 className={styles.favTitle}>{prod.name}</h3>
-                    <div style={{
-                      background: '#f0fdf4',
-                      color: '#166534',
-                      display: 'inline-block',
-                      padding: '0.2rem 0.6rem',
-                      borderRadius: '4px',
-                      fontSize: '0.7rem',
-                      fontWeight: 800,
-                      marginBottom: '0.5rem'
-                    }}>
-                      DESDE EL PRECIO MÁS BAJO
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span className={styles.favPrice}>{prod.price}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+                      <span className={styles.favPrice}>Desde {prod.price}</span>
                     </div>
                   </div>
                 </div>
