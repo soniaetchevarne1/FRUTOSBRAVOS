@@ -143,6 +143,10 @@ export async function syncDatabaseAction() {
         return { success: true, count: products.length };
     } catch (error: any) {
         console.error('Error detallado de sincronización:', error);
-        throw new Error(`Error al sincronizar: ${error.message}.`);
+        return {
+            success: false,
+            error: error.message,
+            tip: 'Verifica que tu internet permita conexiones salientes a bases de datos (Puerto 27017).'
+        };
     }
 }

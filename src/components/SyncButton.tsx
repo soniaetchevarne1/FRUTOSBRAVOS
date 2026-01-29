@@ -13,11 +13,15 @@ export default function SyncButton() {
         setIsSyncing(true);
         try {
             const result = await syncDatabaseAction();
-            alert(`¡Sincronización exitosa! Se procesaron ${result.count} productos.`);
-            window.location.reload();
-        } catch (error) {
+            if (result.success) {
+                alert(`¡Sincronización exitosa! Se procesaron ${result.count} productos.`);
+                window.location.reload();
+            } else {
+                alert(`No se pudo sincronizar:\n\n${result.error}\n\nTIP: ${result.tip}`);
+            }
+        } catch (error: any) {
             console.error(error);
-            alert('Error al sincronizar. Revisa la consola para más detalles.');
+            alert('Error inesperado al sincronizar.');
         } finally {
             setIsSyncing(false);
         }
