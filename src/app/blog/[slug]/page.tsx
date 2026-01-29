@@ -50,8 +50,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     </div>
 
                     {/* Featured Image */}
-                    <div style={{ height: '400px', background: '#e5e7eb', borderRadius: 'var(--radius)', marginBottom: '3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>
-                        <span>Imagen de {post.title}</span>
+                    <div style={{ height: '450px', background: 'var(--surface-alt)', borderRadius: 'var(--radius)', marginBottom: '3rem', overflow: 'hidden' }}>
+                        <img
+                            src={post.image}
+                            alt={post.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
                     </div>
 
                     {/* Content */}

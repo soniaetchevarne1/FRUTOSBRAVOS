@@ -24,9 +24,12 @@ export default function BlogPage() {
                 <div className="grid-cols-2">
                     {blogContent.map((item) => (
                         <Link href={`/blog/${item.slug}`} key={item.id} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                            <div style={{ height: '250px', background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>
-                                {/* Placeholder Image */}
-                                <span>{item.title}</span>
+                            <div style={{ height: '250px', background: 'var(--surface-alt)', overflow: 'hidden' }}>
+                                <img
+                                    src={item.image}
+                                    alt={item.title}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
                             </div>
 
                             <div style={{ padding: '2rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
