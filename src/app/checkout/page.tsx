@@ -38,7 +38,7 @@ export default function CheckoutPage() {
         setEnviando(true);
 
         try {
-            console.log('Procesando pedido v2.8 (Blindado)...');
+            console.log('Procesando pedido v2.9 (Final)...');
             const pedidoId = 'PED-' + Date.now();
             const safeTotalValue = Number(total) || 0;
 
@@ -74,6 +74,7 @@ export default function CheckoutPage() {
             // 1. PREPARAR LINK DE WHATSAPP
             const itemsText = cart.map(item => `- ${item.name} x${item.quantity}`).join('\n');
             const rawMessage = `¡Hola! Nuevo Pedido SONIA APP 🚀\n` +
+                `*Pedido:* ${pedidoId}\n` +
                 `*Cliente:* ${nombre}\n\n` +
                 `*Detalle:*\n${itemsText}\n\n` +
                 `*TOTAL: $${safeTotalValue}*`;
@@ -81,15 +82,21 @@ export default function CheckoutPage() {
             const waUrl = `https://wa.me/5493416091224?text=${encodeURIComponent(rawMessage)}`;
 
             // 2. DISPARAR GUARDADO EN SEGUNDO PLANO (Fire and forget)
-            createOrderAction(pedido).catch(() => { });
+            createOrderAction(pedido).then(() => {
+                console.log('Pedido guardado en la nube exitosamente.');
+            }).catch(e => console.error('Error al guardar en la nube:', e));
 
             // 3. LIMPIAR Y REDIRIGIR AL INSTANTE
             clearCart();
+
+            // Un pequeño aviso de éxito antes de ir a WhatsApp (ayuda a ver si todo terminó bien)
+            alert('¡PEDIDO REGISTRADO EXITOSAMENTE! 🚀\n\nPresiona OK para abrir WhatsApp y enviarlo.');
+
             window.location.href = waUrl;
 
         } catch (error: any) {
-            console.error('Error crítico v2.8:', error);
-            alert('❌ ERROR AL PREPARAR WHATSAPP. Por favor, intenta nuevamente.');
+            console.error('Error crítico v2.9:', error);
+            alert('❌ ERROR AL PROCESAR EL PEDIDO. Por favor intenta de nuevo.');
         } finally {
             setEnviando(false);
         }
@@ -440,7 +447,7 @@ export default function CheckoutPage() {
                             marginTop: '1rem'
                         }}
                     >
-                        {enviando ? 'PROCESANDO...' : 'ENVIAR PEDIDO 🚀 (v2.8)'}
+                        {enviando ? 'PROCESANDO...' : 'ENVIAR PEDIDO 🚀 (v2.9)'}
                     </button>
                 </div>
             </div>
