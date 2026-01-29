@@ -30,10 +30,16 @@ export async function getProducts(): Promise<Product[]> {
     try {
         const client = await clientPromise;
         const db = client.db(DB_NAME);
-        const products = await db.collection<Product>('products').find({}).sort({ order: 1 }).toArray();
+        console.log(`Intentando buscar productos en la colección 'products'...`);
+        // Sort by order if exists, otherwise by category and name
+        const products = await db.collection<Product>('products')
+            .find({})
+            .sort({ order: 1, category: 1, name: 1 })
+            .toArray();
+        console.log(`Se encontraron ${products.length} productos en la base de datos.`);
         return products;
     } catch (error) {
-        console.error('Error obteniendo productos:', error);
+        console.error('Error crítico obteniendo productos de MongoDB:', error);
         return [];
     }
 }

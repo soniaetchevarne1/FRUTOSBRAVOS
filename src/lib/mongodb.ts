@@ -4,26 +4,32 @@ if (!process.env.MONGODB_URI) {
     throw new Error('Por favor agrega MONGODB_URI a las variables de entorno');
 }
 
-const uri = process.env.MONGODB_URI;
-const options = {};
+const options = {
+    serverSelectionTimeoutMS: 15000,
+    connectTimeoutMS: 15000,
+};
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
+const standardUri = process.env.MONGODB_URI;
+// Robust URI with direct hostnames to skip DNS/SRV issues
+const robustUri = "mongodb://soniaetchevarne_db_user:NachoF02@ac-9vn2adl-shard-00-00.6tqs4s6.mongodb.net:27017,ac-9vn2adl-shard-00-01.6tqs4s6.mongodb.net:27017,ac-9vn2adl-shard-00-02.6tqs4s6.mongodb.net:27017/?ssl=true&replicaSet=atlas-m66mki-shard-0&authSource=admin&retryWrites=true&w=majority&appName=FRUTOSBRAVOS";
+
+const uriToUse = standardUri && !standardUri.includes('TU_CONTRASENA_AQUI') ? standardUri : robustUri;
+
 if (process.env.NODE_ENV === 'development') {
-    // En desarrollo, usa una variable global para evitar múltiples conexiones
     const globalWithMongo = global as typeof globalThis & {
         _mongoClientPromise?: Promise<MongoClient>;
     };
 
     if (!globalWithMongo._mongoClientPromise) {
-        client = new MongoClient(uri, options);
+        client = new MongoClient(uriToUse, options);
         globalWithMongo._mongoClientPromise = client.connect();
     }
     clientPromise = globalWithMongo._mongoClientPromise;
 } else {
-    // En producción, es mejor no usar una variable global
-    client = new MongoClient(uri, options);
+    client = new MongoClient(uriToUse, options);
     clientPromise = client.connect();
 }
 
