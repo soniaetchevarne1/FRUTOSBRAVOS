@@ -233,6 +233,35 @@ export async function saveOrder(order: Order) {
     }
 }
 
+export async function deleteOrder(id: string) {
+    if (!isVercel) {
+        const { writeFile } = await import('fs/promises');
+        const pathModule = await import('path');
+        const path = pathModule.default || pathModule;
+        const filePath = path.join(process.cwd(), 'src', 'data', 'db.json');
+
+        const data = await getLocalData();
+        data.orders = (data.orders || []).filter((o: any) => o.id !== id);
+
+        try {
+            await writeFile(filePath, JSON.stringify(data, null, 2));
+        } catch (e: any) {
+            console.error('Error deleting order locally:', e);
+            throw new Error(`Error al eliminar pedido localmente: ${e.message}`);
+        }
+        return;
+    }
+
+    try {
+        const client = await clientPromise;
+        const db = client.db(DB_NAME);
+        await db.collection<Order>('orders').deleteOne({ id });
+    } catch (error) {
+        console.error('Error eliminando pedido:', error);
+        throw error;
+    }
+}
+
 export async function updateOrderStatus(id: string, status: OrderStatus) {
     if (!isVercel) {
         const { writeFile } = await import('fs/promises');
@@ -267,8 +296,6 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
         throw error;
     }
 }
-
-// --- CLIENTES ---
 
 export async function getCustomers() {
     const orders = await getOrders();

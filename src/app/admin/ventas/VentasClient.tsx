@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Order } from '@/lib/types';
-import { updateOrderStatusAction } from '@/app/actions';
-import { Package, ChevronDown, ChevronUp, Clock, CheckCircle, Truck, DollarSign } from 'lucide-react';
+import { updateOrderStatusAction, deleteOrderAction } from '@/app/actions';
+import { Package, ChevronDown, ChevronUp, Clock, CheckCircle, Truck, DollarSign, Trash2 } from 'lucide-react';
 
 export default function VentasClient({ initialOrders }: { initialOrders: Order[] }) {
     const [orders, setOrders] = useState<Order[]>(initialOrders);
@@ -25,6 +25,14 @@ export default function VentasClient({ initialOrders }: { initialOrders: Order[]
         // Optimistic update
         setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
         await updateOrderStatusAction(id, newStatus);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('¿Estás seguro de que quieres eliminar este pedido? Esta acción no se puede deshacer.')) return;
+
+        // Optimistic update
+        setOrders(prev => prev.filter(o => o.id !== id));
+        await deleteOrderAction(id);
     };
 
     const getStatusColor = (status: string) => {
@@ -158,6 +166,26 @@ export default function VentasClient({ initialOrders }: { initialOrders: Order[]
                                     background: '#f9fafb',
                                     animation: 'fadeIn 0.2s ease'
                                 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleDelete(order.id); }}
+                                            style={{
+                                                padding: '0.4rem 0.8rem',
+                                                background: '#fee2e2',
+                                                color: '#991b1b',
+                                                border: '1px solid #f87171',
+                                                borderRadius: '6px',
+                                                fontSize: '0.8rem',
+                                                fontWeight: 800,
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.4rem'
+                                            }}
+                                        >
+                                            <Trash2 size={14} /> ELIMINAR PEDIDO
+                                        </button>
+                                    </div>
 
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
                                         <div>
@@ -244,13 +272,14 @@ export default function VentasClient({ initialOrders }: { initialOrders: Order[]
                         </div>
                     ))}
                 </div>
-            )}
+            )
+            }
             <style jsx>{`
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(-5px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
             `}</style>
-        </div>
+        </div >
     );
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { saveProduct, deleteProduct, reorderProducts, saveOrder, updateOrderStatus } from "@/lib/db";
+import { saveProduct, deleteProduct, reorderProducts, saveOrder, updateOrderStatus, deleteOrder } from "@/lib/db";
 import { Product, Order, OrderStatus } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { writeFile, mkdir, readFile } from "fs/promises";
@@ -99,6 +99,12 @@ export async function createOrderAction(order: Order) {
 export async function updateOrderStatusAction(id: string, status: OrderStatus) {
     await updateOrderStatus(id, status);
     revalidatePath('/admin/ventas');
+}
+
+export async function deleteOrderAction(id: string) {
+    await deleteOrder(id);
+    revalidatePath('/admin/ventas');
+    revalidatePath('/admin/clientes');
 }
 
 export async function syncDatabaseAction() {
