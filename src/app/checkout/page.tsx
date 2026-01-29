@@ -38,6 +38,7 @@ export default function CheckoutPage() {
         setEnviando(true);
 
         try {
+            console.log('Procesando pedido v2.2...');
             const pedido = {
                 id: 'PED-' + Date.now(),
                 customer: {
@@ -67,17 +68,7 @@ export default function CheckoutPage() {
                 type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
             };
 
-            // Intentar guardar en base de datos
-            let guardadoOk = false;
-            try {
-                await createOrderAction(pedido);
-                guardadoOk = true;
-            } catch (serverError: any) {
-                console.error('Error guardando en BD (servidor):', serverError);
-                // No lanzamos el error para permitir que el pedido siga por WhatsApp
-            }
-
-            // Formatear mensaje para WhatsApp
+            // 1. Formatear mensaje para WhatsApp
             const itemsList = cart.map(item => `- ${item.name} x${item.quantity}`).join('%0A');
             const message = `¡Hola! Acabo de realizar un pedido en SONIA APP 🚀%0A%0A` +
                 `*Pedido:* ${pedido.id}%0A` +
@@ -88,23 +79,29 @@ export default function CheckoutPage() {
                 `*Detalle:*%0A${itemsList}%0A%0A` +
                 `*TOTAL: $${new Intl.NumberFormat('es-AR').format(total)}*`;
 
-            const whatsappNumber = "5493416091224"; // Número de Sonia
+            const whatsappNumber = "5493416091224";
             const waUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
 
-            if (guardadoOk) {
-                alert('¡PEDIDO GUARDADO CON ÉXITO! 🚀\n\nAhora se abrirá WhatsApp para enviarnos los detalles del pedido.');
-            } else {
-                alert('⚠️ EL PEDIDO SE ENVIARÁ SOLO POR WHATSAPP\n\nHubo un problema al guardar en la base de datos, pero no te preocupes. Ahora se abrirá WhatsApp para que nos envíes el pedido manualmente.');
-            }
-
-            // Abrir WhatsApp en la misma ventana o nueva
+            // 2. ABRIR WHATSAPP PRIMERO PARA ASEGURAR LA VENTA
             window.open(waUrl, '_blank');
 
+            // 3. Avisar al usuario
+            alert('¡ABRIENDO WHATSAPP! 🚀\n\nPor favor envía el mensaje. Tu pedido ya está en camino.');
+
+            // 4. Intentar guardar en segundo plano (si falla no importa)
+            try {
+                await createOrderAction(pedido);
+            } catch (serverError) {
+                console.warn('Error silencioso de base de datos:', serverError);
+            }
+
+            // 5. Limpiar carrito pero NO redireccionar para no interrumpir
             clearCart();
-            window.location.href = '/tienda';
+            setEnviando(false);
+
         } catch (error: any) {
-            console.error('Client error in order flow:', error);
-            alert('❌ ERROR CRÍTICO:\n' + (error.message || 'Intente nuevamente'));
+            console.error('Error en flujo v2.2:', error);
+            alert('❌ ERROR AL PREPARAR EL PEDIDO:\n' + (error.message || 'Intente nuevamente'));
         } finally {
             setEnviando(false);
         }
