@@ -110,12 +110,19 @@ export default function Home() {
 
             <div className={styles.favoritesGrid}>
               {[
-                { name: 'Almendras Premium', price: '$12.000', img: '/products/almendras.png', badge: '🔥 TOP' },
-                { name: 'Nueces Mariposa', price: '$10.500', img: '/placeholder/nueces.jpg', badge: '⚡ NUEVO' },
-                { name: 'Mix Energético', price: '$5.500', img: '/products/mix-energetico.png', badge: '💪 POWER' },
-                { name: 'Castañas de Cajú', price: '$14.000', img: '/products/castanas.png', badge: '👑 PREMIUM' }
+                { name: 'Almendras Premium', price: '$12.000', img: '/products/almendras.png', badge: '🔥 TOP', slug: 'almendras-nonpareil' },
+                { name: 'Nueces Mariposa', price: '$10.500', img: '/products/nueces_premium.png', badge: '⚡ NUEVO', slug: 'nueces-mariposa' },
+                { name: 'Mix Energético', price: '$5.500', img: '/products/mix-energetico.png', badge: '💪 POWER', slug: 'mix-energetico' },
+                { name: 'Castañas de Cajú', price: '$14.000', img: '/products/castanas_premium.png', badge: '👑 PREMIUM', slug: 'castanas-caju' }
               ].map((prod, i) => (
-                <div key={i} className={`card ${styles.productCard} ${styles.favoriteCard}`} style={{ overflow: 'hidden', border: '2px solid #eee', position: 'relative' }}>
+                <Link key={i} href={`/tienda/${prod.slug}`} className={`card ${styles.productCard} ${styles.favoriteCard}`} style={{
+                  overflow: 'hidden',
+                  border: '2px solid #eee',
+                  position: 'relative',
+                  display: 'block',
+                  textDecoration: 'none',
+                  color: 'inherit'
+                }}>
                   <div className={styles.productBadge}>{prod.badge}</div>
                   <div className={styles.favImgContainer}>
                     <img src={prod.img} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }} className={styles.productImage} />
@@ -125,12 +132,12 @@ export default function Home() {
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 600 }} className={styles.favDesc}>✨ Cosecha Seleccionada</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span className={styles.favPrice}>{prod.price}</span>
-                      <Link href="/tienda" className={styles.addBtnBrave} style={{ textDecoration: 'none' }}>
+                      <div className={styles.addBtnBrave}>
                         <span>+</span>
-                      </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
