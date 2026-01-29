@@ -41,9 +41,29 @@ export default function VentasClient({ initialOrders }: { initialOrders: Order[]
 
     return (
         <div style={{ padding: '1rem' }}>
-            <h1 className="h2" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <DollarSign size={28} /> Ventas y Pedidos
-            </h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <h1 className="h2" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <DollarSign size={28} /> Ventas y Pedidos
+                </h1>
+                <button
+                    onClick={() => window.location.reload()}
+                    style={{
+                        padding: '0.6rem 1.2rem',
+                        background: 'var(--primary)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                    }}
+                >
+                    🔄 ACTUALIZAR LISTA
+                </button>
+            </div>
 
             {orders.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '4rem', background: '#f9fafb', borderRadius: '12px' }}>
