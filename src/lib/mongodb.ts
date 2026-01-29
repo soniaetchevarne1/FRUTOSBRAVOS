@@ -4,8 +4,8 @@ import { MongoClient } from 'mongodb';
 const standardUri = process.env.MONGODB_URI || "";
 
 const options = {
-    serverSelectionTimeoutMS: 15000,
-    connectTimeoutMS: 15000,
+    serverSelectionTimeoutMS: 4000,
+    connectTimeoutMS: 4000,
 };
 
 let client: MongoClient;
