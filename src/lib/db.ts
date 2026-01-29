@@ -8,14 +8,17 @@ const isVercel = process.env.VERCEL === '1' || !!process.env.NOW_REGION;
 
 // --- DYNAMIC IMPORTS FOR LOCAL DB ---
 async function getLocalData() {
-    const { readFile } = await import('fs/promises');
-    const path = (await import('path')).default;
-    const filePath = path.join(process.cwd(), 'src', 'data', 'db.json');
     try {
+        const { readFile } = await import('fs/promises');
+        const pathModule = await import('path');
+        const path = pathModule.default || pathModule;
+        const filePath = path.join(process.cwd(), 'src', 'data', 'db.json');
+
         const content = await readFile(filePath, 'utf8');
         return JSON.parse(content);
-    } catch (e) {
-        return { products: [], orders: [] };
+    } catch (e: any) {
+        console.error('Error reading local data:', e.message);
+        return { products: [], orders: [], blog: [] };
     }
 }
 
@@ -67,10 +70,11 @@ export async function getProduct(slug: string): Promise<Product | undefined> {
 export async function saveProduct(product: Product) {
     if (!isVercel) {
         const { writeFile } = await import('fs/promises');
-        const path = (await import('path')).default;
+        const pathModule = await import('path');
+        const path = pathModule.default || pathModule;
         const filePath = path.join(process.cwd(), 'src', 'data', 'db.json');
-        const data = await getLocalData();
 
+        const data = await getLocalData();
         const index = data.products.findIndex((p: any) => p.id === product.id);
         if (index >= 0) {
             data.products[index] = product;
@@ -78,7 +82,12 @@ export async function saveProduct(product: Product) {
             data.products.push(product);
         }
 
-        await writeFile(filePath, JSON.stringify(data, null, 2));
+        try {
+            await writeFile(filePath, JSON.stringify(data, null, 2));
+        } catch (e: any) {
+            console.error('Error saving product locally:', e);
+            throw new Error(`Error al guardar producto localmente: ${e.message}`);
+        }
         return product;
     }
 
@@ -100,11 +109,19 @@ export async function saveProduct(product: Product) {
 export async function deleteProduct(id: string) {
     if (!isVercel) {
         const { writeFile } = await import('fs/promises');
-        const path = (await import('path')).default;
+        const pathModule = await import('path');
+        const path = pathModule.default || pathModule;
         const filePath = path.join(process.cwd(), 'src', 'data', 'db.json');
+
         const data = await getLocalData();
         data.products = data.products.filter((p: any) => p.id !== id);
-        await writeFile(filePath, JSON.stringify(data, null, 2));
+
+        try {
+            await writeFile(filePath, JSON.stringify(data, null, 2));
+        } catch (e: any) {
+            console.error('Error deleting product locally:', e);
+            throw new Error(`Error al eliminar producto localmente: ${e.message}`);
+        }
         return;
     }
 
@@ -121,11 +138,19 @@ export async function deleteProduct(id: string) {
 export async function reorderProducts(products: Product[]) {
     if (!isVercel) {
         const { writeFile } = await import('fs/promises');
-        const path = (await import('path')).default;
+        const pathModule = await import('path');
+        const path = pathModule.default || pathModule;
         const filePath = path.join(process.cwd(), 'src', 'data', 'db.json');
+
         const data = await getLocalData();
         data.products = products;
-        await writeFile(filePath, JSON.stringify(data, null, 2));
+
+        try {
+            await writeFile(filePath, JSON.stringify(data, null, 2));
+        } catch (e: any) {
+            console.error('Error reordering products locally:', e);
+            throw new Error(`Error al reordenar productos localmente: ${e.message}`);
+        }
         return;
     }
 
@@ -175,11 +200,25 @@ export async function getOrders(): Promise<Order[]> {
 export async function saveOrder(order: Order) {
     if (!isVercel) {
         const { writeFile } = await import('fs/promises');
-        const path = (await import('path')).default;
+        const pathModule = await import('path');
+        const path = pathModule.default || pathModule;
         const filePath = path.join(process.cwd(), 'src', 'data', 'db.json');
+
         const data = await getLocalData();
+
+        // Defensive check: ensure orders is an array
+        if (!data.orders) {
+            data.orders = [];
+        }
+
         data.orders.push(order);
-        await writeFile(filePath, JSON.stringify(data, null, 2));
+
+        try {
+            await writeFile(filePath, JSON.stringify(data, null, 2));
+        } catch (writeError: any) {
+            console.error('Error writing to db.json:', writeError);
+            throw new Error('No se pudo guardar el pedido localmente: ' + writeError.message);
+        }
         return order;
     }
 
@@ -197,14 +236,22 @@ export async function saveOrder(order: Order) {
 export async function updateOrderStatus(id: string, status: OrderStatus) {
     if (!isVercel) {
         const { writeFile } = await import('fs/promises');
-        const path = (await import('path')).default;
+        const pathModule = await import('path');
+        const path = pathModule.default || pathModule;
         const filePath = path.join(process.cwd(), 'src', 'data', 'db.json');
+
         const data = await getLocalData();
         const index = data.orders.findIndex((o: any) => o.id === id);
         if (index >= 0) {
             data.orders[index].status = status;
         }
-        await writeFile(filePath, JSON.stringify(data, null, 2));
+
+        try {
+            await writeFile(filePath, JSON.stringify(data, null, 2));
+        } catch (e: any) {
+            console.error('Error updating order status locally:', e);
+            throw new Error(`Error al actualizar estado localmente: ${e.message}`);
+        }
         return;
     }
 

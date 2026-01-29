@@ -67,12 +67,44 @@ export default function CheckoutPage() {
                 type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
             };
 
-            await createOrderAction(pedido);
-            alert('¡PEDIDO ENVIADO CON ÉXITO! Nos comunicaremos pronto por WhatsApp.');
+            // Intentar guardar en base de datos
+            let guardadoOk = false;
+            try {
+                await createOrderAction(pedido);
+                guardadoOk = true;
+            } catch (serverError: any) {
+                console.error('Error guardando en BD (servidor):', serverError);
+                // No lanzamos el error para permitir que el pedido siga por WhatsApp
+            }
+
+            // Formatear mensaje para WhatsApp
+            const itemsList = cart.map(item => `- ${item.name} x${item.quantity}`).join('%0A');
+            const message = `¡Hola! Acabo de realizar un pedido en SONIA APP 🚀%0A%0A` +
+                `*Pedido:* ${pedido.id}%0A` +
+                `*Cliente:* ${nombre}%0A` +
+                `*Teléfono:* ${telefono}%0A` +
+                `*Entrega:* ${envio === 'envio' ? 'Envío a domicilio' : 'Retiro en local'}%0A` +
+                `*Pago:* ${pago}%0A%0A` +
+                `*Detalle:*%0A${itemsList}%0A%0A` +
+                `*TOTAL: $${new Intl.NumberFormat('es-AR').format(total)}*`;
+
+            const whatsappNumber = "5493416091224"; // Número de Sonia
+            const waUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+
+            if (guardadoOk) {
+                alert('¡PEDIDO GUARDADO CON ÉXITO! 🚀\n\nAhora se abrirá WhatsApp para enviarnos los detalles del pedido.');
+            } else {
+                alert('⚠️ EL PEDIDO SE ENVIARÁ SOLO POR WHATSAPP\n\nHubo un problema al guardar en la base de datos, pero no te preocupes. Ahora se abrirá WhatsApp para que nos envíes el pedido manualmente.');
+            }
+
+            // Abrir WhatsApp en la misma ventana o nueva
+            window.open(waUrl, '_blank');
+
             clearCart();
             window.location.href = '/tienda';
-        } catch (error) {
-            alert('Error al enviar el pedido. Por favor intenta nuevamente.');
+        } catch (error: any) {
+            console.error('Client error in order flow:', error);
+            alert('❌ ERROR CRÍTICO:\n' + (error.message || 'Intente nuevamente'));
         } finally {
             setEnviando(false);
         }

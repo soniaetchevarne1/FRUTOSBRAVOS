@@ -58,14 +58,26 @@ export async function uploadImageAction(formData: FormData) {
 export async function createOrderAction(order: Order) {
     try {
         console.log('Creating order:', order.id);
+
+        // Basic validation
+        if (!order.items || order.items.length === 0) {
+            throw new Error('El carrito está vacío');
+        }
+
         await saveOrder(order);
-        revalidatePath('/admin/ventas');
-        revalidatePath('/admin/clientes');
+
+        try {
+            revalidatePath('/admin/ventas');
+            revalidatePath('/admin/clientes');
+        } catch (revalidateError) {
+            console.error('Error in revalidatePath (non-fatal):', revalidateError);
+        }
+
         console.log('Order created successfully:', order.id);
         return { success: true, orderId: order.id };
-    } catch (error) {
-        console.error('Error creating order:', error);
-        throw new Error('No se pudo crear el pedido. Por favor, contáctanos por WhatsApp.');
+    } catch (error: any) {
+        console.error('SERVER ERROR creating order:', error);
+        throw new Error(error.message || 'No se pudo crear el pedido. Por favor, contáctanos por WhatsApp.');
     }
 }
 

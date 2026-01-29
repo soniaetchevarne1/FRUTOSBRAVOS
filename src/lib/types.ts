@@ -49,7 +49,7 @@ export interface Order {
     discount: number;
     total: number;
     status: OrderStatus;
-    type: 'const' | 'Minorista' | 'Mayorista'; // Keeping legacy or fixing? Let's stick to simple string or what was there. 
+    type: 'Minorista' | 'Mayorista';
     // Actually the previous one was just 'Minorista' | 'Mayorista'. I'll keep it simple but allow 'const' if that was a typo in my thought process? No, let's stick to clean types.
 }
 

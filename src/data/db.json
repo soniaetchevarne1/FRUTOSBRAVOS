@@ -557,6 +557,42 @@
       "total": 16020,
       "status": "Entregado",
       "type": "Minorista"
+    },
+    {
+      "id": "PED-1769715083337",
+      "customer": {
+        "firstName": "sonia2",
+        "lastName": "",
+        "email": "soniaetchevarne",
+        "phone": "341609",
+        "dni": "",
+        "address": "",
+        "city": "",
+        "zip": ""
+      },
+      "deliveryMethod": "retiro",
+      "paymentMethod": "efectivo",
+      "date": "2026-01-29T19:31:23.337Z",
+      "items": [
+        {
+          "productId": "5",
+          "productName": "Pimentón Ahumado Premium (250g)",
+          "quantity": 1,
+          "price": 875
+        },
+        {
+          "productId": "6",
+          "productName": "Cúrcuma en Polvo (500g)",
+          "quantity": 1,
+          "price": 1400
+        }
+      ],
+      "subtotal": 2275,
+      "shippingCost": 0,
+      "discount": 227.5,
+      "total": 2047.5,
+      "status": "Pendiente",
+      "type": "Minorista"
     }
   ],
   "blog": []
