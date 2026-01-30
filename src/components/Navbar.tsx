@@ -51,7 +51,8 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay */}
+            {/* Mobile Menu Overlay / Side Drawer */}
+            {isMenuOpen && <div className={styles.menuBackdrop} onClick={() => setIsMenuOpen(false)}></div>}
             <div className={`${styles.mobileOverlay} ${isMenuOpen ? styles.menuOpen : ''}`}>
                 <div className={styles.mobileLinks}>
                     <Link href="/" onClick={() => setIsMenuOpen(false)}>
@@ -75,7 +76,6 @@ export default function Navbar() {
                     <Link href="/login" onClick={() => setIsMenuOpen(false)} className={styles.authLink}>
                         <LogIn size={20} /> Iniciar sesión
                     </Link>
-
                 </div>
             </div>
         </nav>
