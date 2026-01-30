@@ -62,7 +62,7 @@ export const products: Product[] = [
         priceWholesale: 4800,
         unit: 'kg',
         stock: 40,
-        image: '/products/mix-tropical.png',
+        image: '/uploads/mix-tropical.png',
     },
     {
         id: '12',
@@ -86,7 +86,7 @@ export const products: Product[] = [
         priceWholesale: 6200,
         unit: 'kg',
         stock: 50,
-        image: '/products/mix-sin-pasas.png',
+        image: '/uploads/mix-sin-pasas.png',
     },
     {
         id: '14',
@@ -98,7 +98,7 @@ export const products: Product[] = [
         priceWholesale: 8500,
         unit: 'kg',
         stock: 25,
-        image: '/products/mix-premium-sin-pasas-mani.png',
+        image: '/uploads/mix-premium-sin-pasas-mani.png',
     },
     {
         id: '15',
@@ -110,7 +110,7 @@ export const products: Product[] = [
         priceWholesale: 3800,
         unit: 'kg',
         stock: 60,
-        image: '/products/mix-salado.png',
+        image: '/uploads/mix-salado.png',
     },
     {
         id: '16',
@@ -122,7 +122,7 @@ export const products: Product[] = [
         priceWholesale: 3500,
         unit: 'kg',
         stock: 100,
-        image: '/products/mix-cervecero.png',
+        image: '/uploads/mix-cervecero.png',
     },
     {
         id: '17',
