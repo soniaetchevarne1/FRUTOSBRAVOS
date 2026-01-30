@@ -2,13 +2,15 @@
 
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, User, Menu } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogIn, UserPlus, Phone, Store, Home } from 'lucide-react';
 import styles from './Navbar.module.css';
 import { useStore } from '@/context/StoreContext';
 import NavbarSearch from './NavbarSearch';
+import { useState } from 'react';
 
 export default function Navbar() {
-    const { cartCount, openCart } = useStore();
+    const { cartCount } = useStore();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
         <nav className={styles.navbar}>
@@ -39,7 +41,37 @@ export default function Navbar() {
                         <ShoppingCart size={20} />
                         {cartCount > 0 && <span className={styles.badge}>{cartCount}</span>}
                     </Link>
-                    <button className={styles.mobileMenu} aria-label="Menu"><Menu size={24} /></button>
+                    <button
+                        className={styles.mobileMenu}
+                        aria-label="Menu"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    >
+                        {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                    </button>
+                </div>
+            </div>
+
+            {/* Mobile Menu Overlay */}
+            <div className={`${styles.mobileOverlay} ${isMenuOpen ? styles.menuOpen : ''}`}>
+                <div className={styles.mobileLinks}>
+                    <Link href="/" onClick={() => setIsMenuOpen(false)}>
+                        <Home size={20} /> Inicio
+                    </Link>
+                    <Link href="/tienda" onClick={() => setIsMenuOpen(false)}>
+                        <Store size={20} /> Nuestra Tienda
+                    </Link>
+                    <Link href="/contacto" onClick={() => setIsMenuOpen(false)}>
+                        <Phone size={20} /> Contacto
+                    </Link>
+
+                    <div className={styles.divider}></div>
+
+                    <Link href="/registro" onClick={() => setIsMenuOpen(false)} className={styles.authLink}>
+                        <UserPlus size={20} /> Crear una cuenta
+                    </Link>
+                    <Link href="/login" onClick={() => setIsMenuOpen(false)} className={styles.authLink}>
+                        <LogIn size={20} /> Iniciar sesión
+                    </Link>
                 </div>
             </div>
         </nav>

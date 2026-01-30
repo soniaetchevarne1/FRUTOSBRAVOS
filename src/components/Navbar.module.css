@@ -99,9 +99,72 @@
     }
 
     .mobileMenu {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
         color: var(--text-main);
+        cursor: pointer;
+        transition: color 0.2s;
+        padding: 0;
     }
+
+    .mobileMenu:hover {
+        color: var(--primary);
+    }
+}
+
+.mobileOverlay {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    background: white;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+}
+
+.menuOpen {
+    transform: translateX(0);
+}
+
+.mobileLinks {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.mobileLinks a {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s;
+}
+
+.mobileLinks a:active {
+    color: var(--primary);
+    transform: translateX(10px);
+}
+
+.divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1rem 0;
+}
+
+.authLink {
+    color: var(--primary) !important;
 }
 
 .searchWrapper {
