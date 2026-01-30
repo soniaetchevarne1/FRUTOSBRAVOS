@@ -64,7 +64,7 @@ export const products: Product[] = [
         priceWholesale: 4800,
         unit: 'kg',
         stock: 40,
-        image: '/uploads/mix-tropical.png',
+        image: '/frutos-secos/mix-tropical.png',
     },
     {
         id: '12',
@@ -88,7 +88,7 @@ export const products: Product[] = [
         priceWholesale: 6200,
         unit: 'kg',
         stock: 50,
-        image: '/uploads/mix-sin-pasas.png',
+        image: '/frutos-secos/mix-sin-pasas.png',
     },
     {
         id: '14',
@@ -100,7 +100,7 @@ export const products: Product[] = [
         priceWholesale: 8500,
         unit: 'kg',
         stock: 25,
-        image: '/uploads/mix-premium-sin-pasas-mani.png',
+        image: '/frutos-secos/mix-premium-sin-pasas-mani.png',
     },
     {
         id: '15',
@@ -112,7 +112,7 @@ export const products: Product[] = [
         priceWholesale: 3800,
         unit: 'kg',
         stock: 60,
-        image: '/uploads/mix-salado.png',
+        image: '/frutos-secos/mix-salado.png',
     },
     {
         id: '16',
@@ -124,7 +124,7 @@ export const products: Product[] = [
         priceWholesale: 3500,
         unit: 'kg',
         stock: 100,
-        image: '/uploads/mix-cervecero.png',
+        image: '/frutos-secos/mix-cervecero.png',
     },
     {
         id: '17',
