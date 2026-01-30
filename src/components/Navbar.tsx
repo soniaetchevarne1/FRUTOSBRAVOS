@@ -2,11 +2,12 @@
 
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, User, Menu, X, LogIn, UserPlus, Phone, Store, Home } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogIn, UserPlus, Phone, Store, Home, BookOpen, Sparkles } from 'lucide-react';
 import styles from './Navbar.module.css';
 import { useStore } from '@/context/StoreContext';
 import NavbarSearch from './NavbarSearch';
 import { useState } from 'react';
+import Mascot from './Mascot';
 
 export default function Navbar() {
     const { cartCount } = useStore();
@@ -60,6 +61,9 @@ export default function Navbar() {
                     <Link href="/tienda" onClick={() => setIsMenuOpen(false)}>
                         <Store size={20} /> Nuestra Tienda
                     </Link>
+                    <Link href="/blog" onClick={() => setIsMenuOpen(false)}>
+                        <BookOpen size={20} /> Blog & Recetas
+                    </Link>
                     <Link href="/contacto" onClick={() => setIsMenuOpen(false)}>
                         <Phone size={20} /> Contacto
                     </Link>
@@ -72,6 +76,15 @@ export default function Navbar() {
                     <Link href="/login" onClick={() => setIsMenuOpen(false)} className={styles.authLink}>
                         <LogIn size={20} /> Iniciar sesión
                     </Link>
+
+                    {/* Fun Drawing / Mascot */}
+                    <div className={styles.mascotContainer}>
+                        <Mascot />
+                        <div className={styles.mascotSpeech}>
+                            <Sparkles size={14} />
+                            <span>¡Comé sano, sé BRAVO!</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
