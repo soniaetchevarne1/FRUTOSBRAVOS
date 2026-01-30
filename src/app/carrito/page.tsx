@@ -13,7 +13,7 @@ export default function CarritoPage() {
         return (
             <>
                 <Navbar />
-                <div style={{ maxWidth: '600px', margin: '0 auto', padding: '4rem 1rem', textAlign: 'center' }}>
+                <div style={{ maxWidth: '900px', margin: '0 auto', padding: '4rem 1rem', textAlign: 'center' }}>
                     <div style={{ fontSize: '4rem' }}>🛒</div>
                     <h2 style={{ fontWeight: 800, marginBottom: '1rem' }}>TU CARRITO ESTÁ VACÍO</h2>
                     <Link href="/tienda" style={{
@@ -37,7 +37,7 @@ export default function CarritoPage() {
         <>
             <Navbar />
             <div style={{
-                maxWidth: '600px',
+                maxWidth: '900px',
                 margin: '0 auto',
                 padding: '2rem 1rem 150px',
                 background: '#f8f9fa',
@@ -68,8 +68,8 @@ export default function CarritoPage() {
                             position: 'relative'
                         }}>
                             <div style={{
-                                width: '60px',
-                                height: '60px',
+                                width: '90px',
+                                height: '90px',
                                 background: '#f5f5f5',
                                 borderRadius: '10px',
                                 display: 'flex',
@@ -84,7 +84,7 @@ export default function CarritoPage() {
                                 )}
                             </div>
                             <div style={{ flex: 1 }}>
-                                <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.5rem', paddingRight: '30px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.5rem', paddingRight: '30px' }}>
                                     {item.name}
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -119,7 +119,7 @@ export default function CarritoPage() {
                                             +
                                         </button>
                                     </div>
-                                    <span style={{ fontWeight: 800, color: '#2c5e50', fontSize: '1rem' }}>
+                                    <span style={{ fontWeight: 800, color: '#2c5e50', fontSize: '1.2rem' }}>
                                         ${new Intl.NumberFormat('es-AR').format((isWholesale ? item.priceWholesale : item.priceRetail) * item.quantity)}
                                     </span>
                                 </div>

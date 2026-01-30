@@ -38,7 +38,7 @@ export default function CheckoutPage() {
         setEnviando(true);
 
         try {
-            console.log('Procesando pedido v3.0 (Sincronizado)...');
+            console.log('🚀 Procesando pedido v4.0 (Con Reintentos)...');
             const pedidoId = 'PED-' + Date.now();
             const safeTotalValue = Number(total) || 0;
 
@@ -71,7 +71,7 @@ export default function CheckoutPage() {
                 type: isWholesale ? 'Mayorista' as const : 'Minorista' as const,
             };
 
-            // 1. PREPARAR LINK DE WHATSAPP
+            // PREPARAR LINK DE WHATSAPP
             const itemsText = cart.map(item => `- ${item.name} x${item.quantity}`).join('\n');
             const rawMessage = `¡Hola! Nuevo Pedido FRUTOS BRAVOS 🚀\n` +
                 `*Pedido:* ${pedidoId}\n` +
@@ -81,25 +81,60 @@ export default function CheckoutPage() {
 
             const waUrl = `https://wa.me/5493416091224?text=${encodeURIComponent(rawMessage)}`;
 
-            // 1. INTENTAR GUARDAR (Esperamos máximo 3 segundos)
-            console.log('Sincronizando con administración...');
-            try {
-                await Promise.race([
-                    createOrderAction(pedido),
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout de Servidor')), 3000))
-                ]);
-            } catch (swallowedError) {
-                console.warn('La base de datos falló o tardó demasiado, ignorando para proceder a WhatsApp.');
+            // INTENTAR GUARDAR CON REINTENTOS
+            console.log('💾 Guardando pedido en base de datos...');
+            let guardadoExitoso = false;
+            let intentos = 0;
+            const maxIntentos = 3;
+
+            while (intentos < maxIntentos && !guardadoExitoso) {
+                intentos++;
+                console.log(`Intento ${intentos} de ${maxIntentos}...`);
+
+                try {
+                    await Promise.race([
+                        createOrderAction(pedido),
+                        new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('Timeout')), 10000)
+                        )
+                    ]);
+                    guardadoExitoso = true;
+                    console.log('✅ Pedido guardado exitosamente en la base de datos');
+                } catch (error: any) {
+                    console.warn(`⚠️ Intento ${intentos} falló:`, error.message);
+                    if (intentos < maxIntentos) {
+                        console.log('Reintentando en 1 segundo...');
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
             }
 
-            // 2. REDIRIGIR A WHATSAPP
+            if (!guardadoExitoso) {
+                console.error('❌ No se pudo guardar en la base de datos después de 3 intentos');
+                const continuar = confirm(
+                    '⚠️ ADVERTENCIA: No se pudo guardar el pedido en el sistema.\n\n' +
+                    'El pedido se enviará por WhatsApp, pero NO aparecerá en el panel de administración.\n\n' +
+                    '¿Deseas continuar de todas formas?'
+                );
+
+                if (!continuar) {
+                    setEnviando(false);
+                    return;
+                }
+            }
+
+            // REDIRIGIR A WHATSAPP
             clearCart();
-            alert('✅ PEDIDO REGISTRADO EXITOSAMENTE!\n\nPresiona OK para abrir WhatsApp y enviarlo.');
+            const mensaje = guardadoExitoso
+                ? '✅ PEDIDO REGISTRADO EXITOSAMENTE!\n\nPresiona OK para abrir WhatsApp y enviarlo.'
+                : '⚠️ Pedido enviado a WhatsApp (sin registro en sistema).\n\nPresiona OK para continuar.';
+
+            alert(mensaje);
             window.location.href = waUrl;
 
         } catch (error: any) {
-            console.error('Error crítico v2.9:', error);
-            alert('❌ ERROR AL PROCESAR EL PEDIDO. Por favor intenta de nuevo.');
+            console.error('💥 Error crítico:', error);
+            alert('❌ ERROR AL PROCESAR EL PEDIDO.\n\nPor favor intenta de nuevo o contacta al administrador.');
         } finally {
             setEnviando(false);
         }
@@ -450,7 +485,7 @@ export default function CheckoutPage() {
                             marginTop: '1rem'
                         }}
                     >
-                        {enviando ? 'PROCESANDO...' : 'ENVIAR PEDIDO 🚀 (v3.0)'}
+                        {enviando ? 'PROCESANDO...' : 'ENVIAR PEDIDO 🚀 (v4.0)'}
                     </button>
                 </div>
             </div>

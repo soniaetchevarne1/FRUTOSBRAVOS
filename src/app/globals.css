@@ -231,3 +231,21 @@ button {
 .toast-in {
   animation: slideInRight 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
 }
+
+/* Animación para botón de tienda destacado */
+@keyframes goldenPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 12px 35px rgba(212, 175, 55, 0.6), 0 0 40px rgba(212, 175, 55, 0.4);
+  }
+}
+
+.btn-primary:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5), 0 0 50px rgba(212, 175, 55, 0.3) !important;
+}

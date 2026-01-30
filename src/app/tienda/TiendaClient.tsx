@@ -220,14 +220,23 @@ const CATEGORY_IMAGES_MAP: Record<string, string> = {
 };
 
 export default function TiendaClient({ initialProducts }: { initialProducts: Product[] }) {
+    const searchParams = useSearchParams();
+    const categoryParam = searchParams.get('category');
+
     const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
     // View mode removed at user request
 
     // const [isCartOpen, setIsCartOpen] = useState(false); // Global now
     const { cartCount } = useStore();
     const router = useRouter();
-    const searchParams = useSearchParams();
     const searchQuery = searchParams.get('q')?.toLowerCase() || '';
+
+    // Efecto para seleccionar la categoría desde la URL
+    useEffect(() => {
+        if (categoryParam && CATEGORIES.includes(categoryParam as Category)) {
+            setSelectedCategory(categoryParam as Category);
+        }
+    }, [categoryParam]);
 
     const filteredProducts = useMemo(() => {
         return initialProducts

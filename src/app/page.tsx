@@ -103,24 +103,43 @@ export default function Home() {
               <h2 className="h2" style={{ fontSize: '2.5rem' }}>
                 ⭐ <span style={{ color: 'var(--primary)' }}>Favoritos</span> del Equipo
               </h2>
-              <Link href="/tienda" className="btn-text" style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '1.1rem' }}>
-                VER TODA LA TIENDA →
+              <Link href="/tienda" className="btn btn-primary" style={{
+                padding: '1rem 2.5rem',
+                fontSize: '1.3rem',
+                fontWeight: 900,
+                background: 'linear-gradient(135deg, #D4AF37 0%, #F2A900 100%)',
+                boxShadow: '0 8px 25px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.2)',
+                border: 'none',
+                letterSpacing: '0.5px',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                🛍️ VER TODA LA TIENDA →
               </Link>
             </div>
 
             <div className={styles.favoritesGrid}>
               {[
-                { name: 'Almendras Premium', price: '$12.000', img: '/products/almendras.png', badge: '🔥 TOP', slug: 'almendras-nonpareil' },
-                { name: 'Nueces Mariposa', price: '$10.500', img: '/products/nueces_premium.png', badge: '⚡ NUEVO', slug: 'nueces-mariposa' },
-                { name: 'Mix Energético', price: '$5.500', img: '/products/mix-energetico.png', badge: '💪 POWER', slug: 'mix-energetico' },
+                { name: 'Almendras Premium', price: '$12.000', img: '/products/almendras.png', badge: '🔥 TOP', slug: 'almendras-nonpareil', category: 'Frutos Secos' },
+                { name: 'Nueces Mariposa', price: '$10.500', img: '/products/nueces_premium.png', badge: '⚡ NUEVO', slug: 'nueces-mariposa', category: 'Frutos Secos' },
+                { name: 'Mix Energético', price: '$5.500', img: '/products/mix-energetico.png', badge: '💪 POWER', slug: 'mix-energetico', category: 'Otros' },
               ].map((prod, i) => (
-                <div key={i} className={`card ${styles.productCard} ${styles.favoriteCard}`} style={{
-                  overflow: 'hidden',
-                  border: '2px solid #eee',
-                  position: 'relative',
-                  display: 'block',
-                  cursor: 'default'
-                }}>
+                <Link
+                  key={i}
+                  href={`/tienda?category=${encodeURIComponent(prod.category)}`}
+                  className={`card ${styles.productCard} ${styles.favoriteCard}`}
+                  style={{
+                    overflow: 'hidden',
+                    border: '2px solid #eee',
+                    position: 'relative',
+                    display: 'block',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
                   <div className={styles.productBadge}>{prod.badge}</div>
                   <div className={styles.favImgContainer}>
                     <img src={prod.img} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} className={styles.productImage} />
@@ -131,7 +150,7 @@ export default function Home() {
                       <span className={styles.favPrice}>Desde {prod.price}</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
