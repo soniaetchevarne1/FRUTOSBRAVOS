@@ -2,12 +2,11 @@
 
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, User, Menu, X, LogIn, UserPlus, Phone, Store, Home, BookOpen, Sparkles } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogIn, UserPlus, Phone, Store, Home, BookOpen } from 'lucide-react';
 import styles from './Navbar.module.css';
 import { useStore } from '@/context/StoreContext';
 import NavbarSearch from './NavbarSearch';
 import { useState } from 'react';
-import Mascot from './Mascot';
 
 export default function Navbar() {
     const { cartCount } = useStore();
@@ -77,14 +76,6 @@ export default function Navbar() {
                         <LogIn size={20} /> Iniciar sesión
                     </Link>
 
-                    {/* Fun Drawing / Mascot */}
-                    <div className={styles.mascotContainer}>
-                        <Mascot />
-                        <div className={styles.mascotSpeech}>
-                            <Sparkles size={14} />
-                            <span>¡Comé sano, sé BRAVO!</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </nav>
